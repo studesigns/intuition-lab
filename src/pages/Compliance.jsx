@@ -1,84 +1,129 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
 import TechNodes from '../components/TechNodes';
 import '../styles/AuroraBackground.css';
 
-const mockPolicies = [
-  { id: 1, name: 'Global_Travel_Policy.pdf', size: '2.4 MB', uploadedDate: 'Nov 28, 2025' },
-  { id: 2, name: 'Anti_Bribery_Act_2025.pdf', size: '1.8 MB', uploadedDate: 'Nov 26, 2025' },
-  { id: 3, name: 'APAC_Regional_Addendum.pdf', size: '856 KB', uploadedDate: 'Nov 25, 2025' },
-  { id: 4, name: 'Gift_and_Hospitality_Guide.pdf', size: '1.2 MB', uploadedDate: 'Nov 20, 2025' },
-  { id: 5, name: 'Conflict_of_Interest_Policy.pdf', size: '945 KB', uploadedDate: 'Nov 15, 2025' },
-];
-
-const mockConversation = [
-  {
-    id: 1,
-    type: 'user',
-    message: 'Can I buy a $150 gift for a client in Tokyo?',
-    timestamp: '2:34 PM'
-  },
-  {
-    id: 2,
-    type: 'ai',
-    message: 'RISK DETECTED. The APAC Addendum (Section 3.2.1) overrides the Global Policy. Maximum gift value in Japan is $50 USD equivalent. A $150 gift violates policy.',
-    timestamp: '2:35 PM',
-    compliance: 'risk',
-    sources: ['APAC_Regional_Addendum.pdf', 'Gift_and_Hospitality_Guide.pdf']
-  },
-  {
-    id: 3,
-    type: 'user',
-    message: 'What about virtual team gifts during the holiday season?',
-    timestamp: '2:36 PM'
-  },
-  {
-    id: 4,
-    type: 'ai',
-    message: 'COMPLIANT. Virtual gifts under $100 USD are permitted company-wide during December 1-31 for team recognition (Global Policy Section 2.1). However, ensure gifts are non-cash, non-alcoholic, and do not create conflicts of interest.',
-    timestamp: '2:37 PM',
-    compliance: 'safe',
-    sources: ['Global_Travel_Policy.pdf']
-  },
-];
+// API Configuration
+const API_URL = 'https://intuition-api.onrender.com';
 
 export default function Compliance() {
   const navigate = useNavigate();
-  const [conversation, setConversation] = useState(mockConversation);
+  const [policies, setPolicies] = useState([]);
+  const [conversation, setConversation] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [querying, setQuerying] = useState(false);
+  const [error, setError] = useState(null);
   const chatEndRef = useRef(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [conversation]);
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  // Check API status on mount
+  useEffect(() => {
+    const checkAPI = async () => {
+      try {
+        const response = await fetch(`${API_URL}/status`);
+        if (response.ok) {
+          setError(null);
+        }
+      } catch (err) {
+        setError('Unable to connect to compliance server. Please refresh.');
+      }
+    };
+    checkAPI();
+  }, []);
 
-    const newUserMessage = {
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+    if (policies.length === 0) {
+      setError('Please upload policy documents first');
+      return;
+    }
+
+    const userMessage = {
       id: conversation.length + 1,
       type: 'user',
       message: inputValue,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setConversation(prev => [...prev, newUserMessage]);
+    setConversation(prev => [...prev, userMessage]);
+    const question = inputValue;
     setInputValue('');
+    setError(null);
 
-    setTimeout(() => {
-      const newAIMessage = {
-        id: conversation.length + 2,
+    // Add thinking bubble
+    const thinkingMessage = {
+      id: conversation.length + 2,
+      type: 'ai',
+      message: 'Analyzing policies...',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      compliance: 'reviewing',
+      sources: []
+    };
+
+    setConversation(prev => [...prev, thinkingMessage]);
+    setQuerying(true);
+
+    try {
+      const response = await fetch(`${API_URL}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Determine compliance status from response
+      let complianceStatus = 'reviewing';
+      if (data.compliance_status === 'RISK DETECTED') {
+        complianceStatus = 'risk';
+      } else if (data.compliance_status === 'COMPLIANT') {
+        complianceStatus = 'safe';
+      }
+
+      const aiMessage = {
+        id: conversation.length + 3,
         type: 'ai',
-        message: 'Analysis in progress... This would be connected to your backend API for real compliance analysis.',
+        message: data.answer || 'Unable to analyze policies',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        compliance: 'reviewing',
-        sources: ['Global_Travel_Policy.pdf']
+        compliance: complianceStatus,
+        sources: data.sources || []
       };
-      setConversation(prev => [...prev, newAIMessage]);
-    }, 800);
+
+      setConversation(prev => {
+        // Replace thinking message with real response
+        const updated = prev.slice(0, -1);
+        return [...updated, aiMessage];
+      });
+    } catch (err) {
+      console.error('Query error:', err);
+      setError('Connecting to secure server... please retry.');
+
+      // Replace thinking message with error
+      setConversation(prev => {
+        const updated = prev.slice(0, -1);
+        return [...updated, {
+          id: prev.length,
+          type: 'ai',
+          message: 'Error: Unable to process your question. Please try again.',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          compliance: 'error',
+          sources: []
+        }];
+      });
+    } finally {
+      setQuerying(false);
+    }
   };
 
   const handleDrag = (e) => {
@@ -91,10 +136,57 @@ export default function Compliance() {
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length === 0) return;
+
+    // Filter for PDF files only
+    const pdfFiles = Array.from(files).filter(f => f.type === 'application/pdf');
+    if (pdfFiles.length === 0) {
+      setError('Please drop PDF files only');
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      pdfFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
+      const response = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Add uploaded files to policies list
+      const newPolicies = pdfFiles.map((file, idx) => ({
+        id: policies.length + idx,
+        name: file.name,
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        uploadedDate: new Date().toLocaleDateString()
+      }));
+
+      setPolicies(prev => [...prev, ...newPolicies]);
+      setError(null);
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Connecting to secure server... please retry.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -218,9 +310,32 @@ export default function Compliance() {
               color: '#94a3b8',
               margin: 0,
             }}>
-              {mockPolicies.length} documents loaded
+              {policies.length} document{policies.length !== 1 ? 's' : ''} loaded
             </p>
           </div>
+
+          {/* Error Banner */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                padding: '0.75rem 1rem',
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '6px',
+                margin: '0.5rem 1rem',
+                fontSize: '0.75rem',
+                color: '#fca5a5',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <AlertTriangle size={14} />
+              {error}
+            </motion.div>
+          )}
 
           {/* Policy List */}
           <div style={{
@@ -231,8 +346,19 @@ export default function Compliance() {
             flexDirection: 'column',
             gap: '0.75rem',
           }}>
+            {policies.length === 0 && !uploading && (
+              <p style={{
+                fontSize: '0.875rem',
+                color: '#64748b',
+                textAlign: 'center',
+                padding: '2rem 1rem',
+                fontStyle: 'italic',
+              }}>
+                No policies uploaded yet. Drop PDFs below to get started.
+              </p>
+            )}
             <AnimatePresence>
-              {mockPolicies.map((policy, index) => (
+              {policies.map((policy, index) => (
                 <motion.div
                   key={policy.id}
                   initial={{ opacity: 0, y: 10 }}
@@ -292,43 +418,58 @@ export default function Compliance() {
             style={{
               margin: '1rem',
               padding: '2rem',
-              border: dragActive ? '2px solid #0891b2' : '2px dashed rgba(255, 255, 255, 0.2)',
+              border: dragActive ? '2px solid #0891b2' : uploading ? '2px solid rgba(8, 145, 178, 0.5)' : '2px dashed rgba(255, 255, 255, 0.2)',
               borderRadius: '12px',
-              background: dragActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent',
+              background: dragActive ? 'rgba(8, 145, 178, 0.1)' : uploading ? 'rgba(8, 145, 178, 0.05)' : 'transparent',
               transition: 'all 0.3s ease',
-              cursor: 'pointer',
+              cursor: uploading ? 'not-allowed' : 'pointer',
               textAlign: 'center',
+              opacity: uploading ? 0.7 : 1,
             }}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            whileHover={{
+            onDragEnter={!uploading ? handleDrag : undefined}
+            onDragLeave={!uploading ? handleDrag : undefined}
+            onDragOver={!uploading ? handleDrag : undefined}
+            onDrop={!uploading ? handleDrop : undefined}
+            whileHover={!uploading ? {
               borderColor: 'rgba(8, 145, 178, 0.5)',
               background: 'rgba(8, 145, 178, 0.05)',
-            }}
+            } : {}}
           >
-            <Upload size={24} style={{
-              color: '#0891b2',
-              margin: '0 auto 0.75rem',
-              display: 'block',
-            }} />
+            {uploading ? (
+              <Loader size={24} style={{
+                color: '#0891b2',
+                margin: '0 auto 0.75rem',
+                display: 'block',
+                animation: 'spin 1s linear infinite',
+              }} />
+            ) : (
+              <Upload size={24} style={{
+                color: '#0891b2',
+                margin: '0 auto 0.75rem',
+                display: 'block',
+              }} />
+            )}
             <p style={{
               fontSize: '0.875rem',
               color: '#cbd5e1',
               margin: '0 0 0.25rem 0',
               fontWeight: '500',
             }}>
-              Drop policies here
+              {uploading ? 'Uploading & Indexing...' : 'Drop policies here'}
             </p>
             <p style={{
               fontSize: '0.75rem',
               color: '#64748b',
               margin: 0,
             }}>
-              or click to browse
+              {uploading ? 'Please wait...' : 'or click to browse'}
             </p>
           </motion.div>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
         </motion.div>
 
         {/* Right Panel: Intelligence Stream (70%) */}
@@ -353,6 +494,48 @@ export default function Compliance() {
             flexDirection: 'column',
             gap: '1.5rem',
           }}>
+            {conversation.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  gap: '1.5rem',
+                }}
+              >
+                <div style={{
+                  padding: '2rem',
+                  background: 'rgba(8, 145, 178, 0.1)',
+                  border: '1px solid rgba(8, 145, 178, 0.2)',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                }}>
+                  <h3 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '700',
+                    color: '#cbd5e1',
+                    margin: '0 0 0.5rem 0',
+                  }}>
+                    Compliance Risk Engine Ready
+                  </h3>
+                  <p style={{
+                    fontSize: '0.95rem',
+                    color: '#94a3b8',
+                    margin: 0,
+                    lineHeight: '1.5',
+                  }}>
+                    {policies.length === 0
+                      ? 'Upload compliance policies from the left panel to begin. Drop PDF files to index them, then ask questions about compliance requirements.'
+                      : `${policies.length} policy document${policies.length !== 1 ? 's' : ''} loaded. Ask questions to analyze compliance risks.`}
+                  </p>
+                </div>
+              </motion.div>
+            )}
             <AnimatePresence>
               {conversation.map((msg, index) => (
                 <motion.div
