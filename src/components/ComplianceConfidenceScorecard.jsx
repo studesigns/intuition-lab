@@ -263,8 +263,6 @@ export default function ComplianceConfidenceScorecard({
                 color: '#cbd5e1',
                 lineHeight: '1.6',
                 whiteSpace: 'pre-wrap',
-                maxHeight: '200px',
-                overflowY: 'auto',
               }}>
                 {details}
               </div>
