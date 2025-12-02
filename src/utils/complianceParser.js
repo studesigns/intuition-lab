@@ -5,44 +5,69 @@
 
 /**
  * Parse compliance status and extract rule details
+ * ROBUST PARSER: Handles raw JSON, markdown JSON, and text fallback
  *
  * @param {Object} response - API response object
  * @returns {Object} Parsed compliance data
  */
 export function parseComplianceResponse(response) {
-  const answer = response.answer || '';
-  const status = response.compliance_status || 'REQUIRES REVIEW';
-  const sources = response.sources || [];
+  try {
+    // ===== ROBUST PARSING: Try to extract JSON from backend =====
+    let jsonData = null;
+    let riskLevel = 'moderate'; // default
+    let ruleTriggered = 'Compliance assessment pending...';
+    let details = '';
+    let status = 'REQUIRES REVIEW';
+    const sources = response.sources || [];
 
-  // ===== CRITICAL FIX: Use JSON risk_level from backend if available =====
-  // Backend now returns risk_classification with risk_level field
-  // Must prefer this over text parsing to prevent UI state mismatch
-  let riskLevel = 'moderate'; // default
-
-  if (response.risk_classification && response.risk_classification.risk_level) {
-    // Map backend risk_level to component format
-    const backendLevel = response.risk_classification.risk_level.toLowerCase();
-    if (['critical', 'high', 'moderate', 'low'].includes(backendLevel)) {
-      riskLevel = backendLevel;
+    // Strategy 1: Check if response contains raw JSON structure
+    if (response.risk_level) {
+      // Backend returned JSON fields directly
+      const level = String(response.risk_level).toLowerCase();
+      if (['critical', 'high', 'moderate', 'low'].includes(level)) {
+        riskLevel = level;
+      }
+      ruleTriggered = response.violation_summary || 'Compliance decision';
+      details = response.detailed_analysis || response.answer || '';
+      status = response.compliance_status || status;
     }
-  } else {
-    // Fallback to text parsing only if backend doesn't provide JSON
-    riskLevel = determineRiskLevel(answer, status);
+    // Strategy 2: Check for risk_classification nested object
+    else if (response.risk_classification && response.risk_classification.risk_level) {
+      const level = String(response.risk_classification.risk_level).toLowerCase();
+      if (['critical', 'high', 'moderate', 'low'].includes(level)) {
+        riskLevel = level;
+      }
+      ruleTriggered = response.violation_summary || 'Compliance decision';
+      details = response.detailed_analysis || response.answer || '';
+      status = response.compliance_status || status;
+    }
+    // Strategy 3: Fallback to text parsing (legacy format)
+    else {
+      const answer = response.answer || '';
+      riskLevel = determineRiskLevel(answer, response.compliance_status || 'REQUIRES REVIEW');
+      ruleTriggered = response.violation_summary || extractRuleTriggered(answer);
+      details = cleanupDetails(answer);
+      status = response.compliance_status || 'REQUIRES REVIEW';
+    }
+
+    return {
+      riskLevel: riskLevel,  // CRITICAL, HIGH, MODERATE, LOW - drives card color
+      ruleTriggered: ruleTriggered,
+      details: details,
+      sources: sources,
+      rawStatus: status
+    };
+  } catch (err) {
+    console.error('Parse error:', err);
+    // Graceful fallback
+    return {
+      riskLevel: 'moderate',
+      ruleTriggered: 'Error processing compliance data',
+      details: 'Please try again',
+      sources: [],
+      rawStatus: 'REQUIRES REVIEW'
+    };
   }
-
-  // ===== Use violation_summary from backend if available =====
-  // Falls back to text parsing if backend doesn't provide violation_summary
-  let ruleTriggered = response.violation_summary
-    ? response.violation_summary
-    : extractRuleTriggered(answer);
-
-  return {
-    riskLevel: riskLevel,  // Now from backend JSON risk_classification, not text parsing
-    ruleTriggered: ruleTriggered,
-    details: cleanupDetails(answer),
-    sources: sources,
-    rawStatus: status
-  };
 }
 
 /**
