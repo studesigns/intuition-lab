@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
 import TechNodes from '../components/TechNodes';
+import ComplianceConfidenceScorecard from '../components/ComplianceConfidenceScorecard';
+import { parseComplianceResponse, formatComplianceAction } from '../utils/complianceParser';
 import '../styles/AuroraBackground.css';
 
 // API Configuration
@@ -83,21 +85,20 @@ export default function Compliance() {
 
       const data = await response.json();
 
-      // Determine compliance status from response
-      let complianceStatus = 'reviewing';
-      if (data.compliance_status === 'RISK DETECTED') {
-        complianceStatus = 'risk';
-      } else if (data.compliance_status === 'COMPLIANT') {
-        complianceStatus = 'safe';
-      }
+      // Parse compliance response for granular details
+      const parsedCompliance = parseComplianceResponse(data);
 
       const aiMessage = {
         id: conversation.length + 3,
         type: 'ai',
         message: data.answer || 'Unable to analyze policies',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        compliance: complianceStatus,
-        sources: data.sources || []
+        compliance: parsedCompliance.riskLevel,
+        sources: data.sources || [],
+        // New fields for detailed scorecard
+        ruleTriggered: parsedCompliance.ruleTriggered,
+        details: parsedCompliance.details,
+        rawStatus: parsedCompliance.rawStatus
       };
 
       setConversation(prev => {
@@ -124,6 +125,33 @@ export default function Compliance() {
     } finally {
       setQuerying(false);
     }
+  };
+
+  const handleScorecardAction = (actionType, metadata) => {
+    // Format and log the action
+    const formattedAction = formatComplianceAction(actionType, metadata);
+    console.log('Compliance Action:', formattedAction);
+
+    // Show confirmation message based on action type
+    const confirmationMessages = {
+      accept: 'Compliance accepted. Document archived.',
+      generateAffidavit: 'Generating affidavit form... (This would trigger document generation)',
+      requestApproval: 'Approval request sent to manager. Awaiting response...',
+      escalate: 'Case escalated to Compliance Officer. High-priority ticket created.',
+      viewReport: 'Generating detailed risk report...'
+    };
+
+    const message = confirmationMessages[actionType] || 'Action processed.';
+    const confirmationMsg = {
+      id: conversation.length + 1,
+      type: 'system',
+      message,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      action: actionType,
+      metadata
+    };
+
+    setConversation(prev => [...prev, confirmationMsg]);
   };
 
   const handleDrag = (e) => {
@@ -580,139 +608,13 @@ export default function Compliance() {
 
                     {msg.type === 'ai' && (
                       <>
-                        {msg.compliance === 'risk' && (
-                          <div style={{
-                            padding: '1.25rem',
-                            background: 'rgba(239, 68, 68, 0.15)',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
-                            borderRadius: '12px',
-                            display: 'flex',
-                            gap: '1rem',
-                          }}>
-                            <AlertTriangle size={20} style={{
-                              color: '#ef4444',
-                              flexShrink: 0,
-                              marginTop: '0.1rem',
-                            }} />
-                            <div>
-                              <p style={{
-                                fontSize: '0.875rem',
-                                fontWeight: '700',
-                                color: '#fca5a5',
-                                margin: '0 0 0.5rem 0',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                              }}>
-                                Risk Detected
-                              </p>
-                              <p style={{
-                                fontSize: '0.95rem',
-                                color: '#f1f5f9',
-                                margin: 0,
-                                lineHeight: '1.5',
-                              }}>
-                                {msg.message}
-                              </p>
-                              {msg.sources && (
-                                <div style={{
-                                  display: 'flex',
-                                  gap: '0.5rem',
-                                  marginTop: '0.75rem',
-                                  flexWrap: 'wrap',
-                                }}>
-                                  {msg.sources.map((source, i) => (
-                                    <span key={i} style={{
-                                      fontSize: '0.75rem',
-                                      padding: '0.25rem 0.75rem',
-                                      background: 'rgba(239, 68, 68, 0.2)',
-                                      border: '1px solid rgba(239, 68, 68, 0.4)',
-                                      borderRadius: '6px',
-                                      color: '#fca5a5',
-                                      whiteSpace: 'nowrap',
-                                    }}>
-                                      📄 {source}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {msg.compliance === 'safe' && (
-                          <div style={{
-                            padding: '1.25rem',
-                            background: 'rgba(34, 197, 94, 0.15)',
-                            border: '1px solid rgba(34, 197, 94, 0.3)',
-                            borderRadius: '12px',
-                            display: 'flex',
-                            gap: '1rem',
-                          }}>
-                            <CheckCircle2 size={20} style={{
-                              color: '#22c55e',
-                              flexShrink: 0,
-                              marginTop: '0.1rem',
-                            }} />
-                            <div>
-                              <p style={{
-                                fontSize: '0.875rem',
-                                fontWeight: '700',
-                                color: '#86efac',
-                                margin: '0 0 0.5rem 0',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                              }}>
-                                Compliant
-                              </p>
-                              <p style={{
-                                fontSize: '0.95rem',
-                                color: '#f1f5f9',
-                                margin: 0,
-                                lineHeight: '1.5',
-                              }}>
-                                {msg.message}
-                              </p>
-                              {msg.sources && (
-                                <div style={{
-                                  display: 'flex',
-                                  gap: '0.5rem',
-                                  marginTop: '0.75rem',
-                                  flexWrap: 'wrap',
-                                }}>
-                                  {msg.sources.map((source, i) => (
-                                    <span key={i} style={{
-                                      fontSize: '0.75rem',
-                                      padding: '0.25rem 0.75rem',
-                                      background: 'rgba(34, 197, 94, 0.2)',
-                                      border: '1px solid rgba(34, 197, 94, 0.4)',
-                                      borderRadius: '6px',
-                                      color: '#86efac',
-                                      whiteSpace: 'nowrap',
-                                    }}>
-                                      📄 {source}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {msg.compliance === 'reviewing' && (
-                          <div style={{
-                            padding: '1.25rem',
-                            background: 'rgba(8, 145, 178, 0.15)',
-                            border: '1px solid rgba(8, 145, 178, 0.3)',
-                            borderRadius: '12px',
-                            color: '#cbd5e1',
-                            fontSize: '0.95rem',
-                            lineHeight: '1.5',
-                            fontStyle: 'italic',
-                          }}>
-                            {msg.message}
-                          </div>
-                        )}
-
+                        <ComplianceConfidenceScorecard
+                          riskLevel={msg.compliance}
+                          ruleTriggered={msg.ruleTriggered}
+                          details={msg.details}
+                          sources={msg.sources}
+                          onAction={handleScorecardAction}
+                        />
                         <p style={{
                           fontSize: '0.75rem',
                           color: '#64748b',
@@ -722,6 +624,29 @@ export default function Compliance() {
                           {msg.timestamp}
                         </p>
                       </>
+                    )}
+
+                    {msg.type === 'system' && (
+                      <div style={{
+                        padding: '0.875rem 1rem',
+                        background: 'rgba(8, 145, 178, 0.1)',
+                        border: '1px solid rgba(8, 145, 178, 0.2)',
+                        borderRadius: '8px',
+                        color: '#cbd5e1',
+                        fontSize: '0.875rem',
+                        lineHeight: '1.5',
+                      }}>
+                        <p style={{ margin: '0 0 0.25rem 0' }}>
+                          ✓ {msg.message}
+                        </p>
+                        <p style={{
+                          fontSize: '0.75rem',
+                          color: '#64748b',
+                          margin: 0,
+                        }}>
+                          {msg.timestamp}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </motion.div>
