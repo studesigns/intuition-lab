@@ -14,9 +14,15 @@ export function parseComplianceResponse(response) {
   const status = response.compliance_status || 'REQUIRES REVIEW';
   const sources = response.sources || [];
 
+  // ===== UPDATED: Use violation_summary from backend if available =====
+  // Falls back to text parsing if backend doesn't provide violation_summary
+  let ruleTriggered = response.violation_summary
+    ? response.violation_summary
+    : extractRuleTriggered(answer);
+
   return {
     riskLevel: determineRiskLevel(answer, status),
-    ruleTriggered: extractRuleTriggered(answer),
+    ruleTriggered: ruleTriggered,  // Now from backend JSON, not text parsing
     details: cleanupDetails(answer),
     sources: sources,
     rawStatus: status
