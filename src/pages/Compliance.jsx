@@ -133,12 +133,22 @@ export default function Compliance() {
     console.log('Compliance Action:', formattedAction);
 
     // Show confirmation message based on action type
+    // Updated for 4-tier Risk Taxonomy system
     const confirmationMessages = {
+      // Low (Approved) Risk
       accept: 'Compliance accepted. Document archived.',
+
+      // Moderate (Flagged) Risk
       generateAffidavit: 'Generating affidavit form... (This would trigger document generation)',
       requestApproval: 'Approval request sent to manager. Awaiting response...',
-      escalate: 'Case escalated to Compliance Officer. High-priority ticket created.',
-      viewReport: 'Generating detailed risk report...'
+
+      // High (Escalate) Risk
+      escalateVP: 'Escalation request sent to VP for approval. This transaction is on hold pending review.',
+      requestOverride: 'Override request submitted to VP. Transaction requires explicit authorization.',
+
+      // Critical (Blocked) Risk
+      escalate: 'Case escalated to Compliance Officer. High-priority ticket created. Transaction blocked.',
+      viewReport: 'Generating detailed risk report with violation details...'
     };
 
     const message = confirmationMessages[actionType] || 'Action processed.';

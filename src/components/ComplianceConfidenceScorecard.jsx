@@ -15,15 +15,21 @@ import { useState } from 'react';
  * Compliance Confidence Scorecard Component
  * Displays risk level with granular compliance information and dynamic actions
  *
+ * Supports 4-tier Risk Taxonomy:
+ *   - 'critical' (RED): Federal/local law violations, forbidden categories → BLOCKED
+ *   - 'high' (ORANGE): Hard limit violations, regulatory violations → ESCALATE TO VP
+ *   - 'moderate' (YELLOW): Missing documentation, procedural errors → REQUIRES REMEDIAL ACTION
+ *   - 'low' (GREEN): Fully compliant → AUTO-APPROVED
+ *
  * Props:
- *   - riskLevel: 'approved' | 'flagged' | 'blocked'
+ *   - riskLevel: 'critical' | 'high' | 'moderate' | 'low'
  *   - ruleTriggered: string (one-sentence summary of the rule)
  *   - details: string (full compliance analysis)
  *   - sources: string[] (policy sources)
  *   - onAction: function (callback for action button click)
  */
 export default function ComplianceConfidenceScorecard({
-  riskLevel = 'flagged',
+  riskLevel = 'moderate',
   ruleTriggered = 'Risk assessment pending...',
   details = '',
   sources = [],
@@ -32,9 +38,9 @@ export default function ComplianceConfidenceScorecard({
   const [showDetails, setShowDetails] = useState(true);
   const [actionInProgress, setActionInProgress] = useState(false);
 
-  // Risk configuration with colors, icons, and actions
+  // Risk configuration with colors, icons, and actions for 4-tier system
   const RISK_CONFIG = {
-    approved: {
+    low: {
       badge: 'Approved',
       bgColor: 'rgba(34, 197, 94, 0.15)',
       borderColor: 'rgba(34, 197, 94, 0.3)',
@@ -52,9 +58,10 @@ export default function ComplianceConfidenceScorecard({
           onClick: 'accept'
         }
       ],
-      description: 'This transaction meets all compliance requirements.'
+      description: 'This transaction meets all compliance requirements.',
+      confidence: 100
     },
-    flagged: {
+    moderate: {
       badge: 'Flagged',
       bgColor: 'rgba(234, 179, 8, 0.15)',
       borderColor: 'rgba(234, 179, 8, 0.3)',
@@ -79,9 +86,38 @@ export default function ComplianceConfidenceScorecard({
           onClick: 'requestApproval'
         }
       ],
-      description: 'This transaction is compliant but requires additional documentation.'
+      description: 'This transaction requires additional documentation or approval before proceeding.',
+      confidence: 50
     },
-    blocked: {
+    high: {
+      badge: 'Escalate',
+      bgColor: 'rgba(234, 88, 12, 0.15)',
+      borderColor: 'rgba(234, 88, 12, 0.3)',
+      badgeBg: 'rgba(234, 88, 12, 0.2)',
+      badgeText: '#fed7aa',
+      headerColor: '#ea580c',
+      icon: AlertCircle,
+      iconColor: '#ea580c',
+      actions: [
+        {
+          label: 'Escalate to VP',
+          icon: Zap,
+          color: '#ea580c',
+          hoverColor: '#c2410c',
+          onClick: 'escalateVP'
+        },
+        {
+          label: 'Request Override',
+          icon: Send,
+          color: '#ea580c',
+          hoverColor: '#c2410c',
+          onClick: 'requestOverride'
+        }
+      ],
+      description: 'This transaction exceeds hard limits and requires VP approval to proceed.',
+      confidence: 25
+    },
+    critical: {
       badge: 'Blocked',
       bgColor: 'rgba(239, 68, 68, 0.15)',
       borderColor: 'rgba(239, 68, 68, 0.3)',
@@ -106,11 +142,12 @@ export default function ComplianceConfidenceScorecard({
           onClick: 'viewReport'
         }
       ],
-      description: 'This transaction violates compliance policies and has been blocked.'
+      description: 'This transaction violates federal/local law or explicitly forbidden policies and has been blocked.',
+      confidence: 0
     }
   };
 
-  const config = RISK_CONFIG[riskLevel] || RISK_CONFIG.flagged;
+  const config = RISK_CONFIG[riskLevel] || RISK_CONFIG.moderate;
   const IconComponent = config.icon;
 
   const handleActionClick = (actionType) => {
@@ -348,7 +385,7 @@ export default function ComplianceConfidenceScorecard({
         })}
       </div>
 
-      {/* Risk Level Indicator Bar */}
+      {/* Risk Level Indicator Bar (Confidence Score) */}
       <div style={{
         marginTop: '1.5rem',
         height: '3px',
@@ -359,7 +396,7 @@ export default function ComplianceConfidenceScorecard({
         <motion.div
           initial={{ width: '0%' }}
           animate={{
-            width: riskLevel === 'approved' ? '100%' : riskLevel === 'flagged' ? '50%' : '0%'
+            width: config.confidence + '%'
           }}
           transition={{ duration: 0.6, delay: 0.2 }}
           style={{

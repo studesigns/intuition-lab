@@ -25,51 +25,80 @@ export function parseComplianceResponse(response) {
 
 /**
  * Determine risk level from compliance status and answer content
- * @returns {string} 'approved' | 'flagged' | 'blocked'
+ * Now uses the 4-tier Risk Taxonomy: CRITICAL, HIGH, MODERATE, LOW
+ * @returns {string} 'critical' | 'high' | 'moderate' | 'low'
  */
 function determineRiskLevel(answer, status) {
   const answerLower = answer.toLowerCase();
 
-  // Hard violations - Red (Blocked)
+  // CRITICAL (Red) - Federal/local law violations, forbidden categories
   if (
-    answerLower.includes('prohibited') ||
-    answerLower.includes('not allowed') ||
-    answerLower.includes('banned') ||
-    answerLower.includes('violat') ||
-    answerLower.includes('risk detected') ||
-    status === 'RISK DETECTED'
+    answerLower.includes('bribery') ||
+    answerLower.includes('money laundering') ||
+    answerLower.includes('embezzlement') ||
+    answerLower.includes('fraud') ||
+    answerLower.includes('illegal') ||
+    answerLower.includes('federal') ||
+    answerLower.includes('law violation') ||
+    answerLower.includes('criminal') ||
+    answerLower.includes('gambling') ||
+    answerLower.includes('adult entertainment') ||
+    answerLower.includes('explicitly forbidden') ||
+    answerLower.includes('strictly prohibited') ||
+    status === 'CRITICAL'
   ) {
-    return 'blocked';
+    return 'critical';
   }
 
-  // Requires documentation - Yellow (Flagged)
+  // HIGH (Orange) - Hard limit violations, regulatory violations
+  if (
+    (answerLower.includes('violat') && answerLower.includes('hard limit')) ||
+    answerLower.includes('exceeds limit') ||
+    answerLower.includes('over 20%') ||
+    answerLower.includes('business class') ||
+    answerLower.includes('vp approval') ||
+    answerLower.includes('regulatory') ||
+    answerLower.includes('significant risk') ||
+    answerLower.includes('requires vp') ||
+    answerLower.includes('escalate to vp') ||
+    status === 'HIGH'
+  ) {
+    return 'high';
+  }
+
+  // MODERATE (Yellow) - Missing documentation, minor errors
   if (
     answerLower.includes('requires review') ||
     answerLower.includes('documentation') ||
-    answerLower.includes('approval') ||
     answerLower.includes('receipt') ||
-    answerLower.includes('flagged') ||
-    answerLower.includes('requires') ||
-    answerLower.includes('manager approval') ||
-    answerLower.includes('compliance review') ||
-    status === 'REQUIRES REVIEW'
+    answerLower.includes('missing form') ||
+    answerLower.includes('affidavit') ||
+    answerLower.includes('procedural') ||
+    answerLower.includes('missing approval') ||
+    answerLower.includes('lost receipt') ||
+    answerLower.includes('wrong channel') ||
+    answerLower.includes('requires docs') ||
+    answerLower.includes('remedial') ||
+    status === 'MODERATE'
   ) {
-    return 'flagged';
+    return 'moderate';
   }
 
-  // Fully compliant - Green (Approved)
+  // LOW (Green) - Fully compliant
   if (
     answerLower.includes('compliant') ||
     answerLower.includes('allowed') ||
     answerLower.includes('permitted') ||
     answerLower.includes('approved') ||
-    status === 'COMPLIANT'
+    answerLower.includes('within limits') ||
+    answerLower.includes('no issues') ||
+    status === 'LOW'
   ) {
-    return 'approved';
+    return 'low';
   }
 
-  // Default
-  return 'flagged';
+  // Default - when unclear, be conservative
+  return 'moderate';
 }
 
 /**
@@ -152,14 +181,24 @@ function cleanupDetails(answer) {
 
 /**
  * Format compliance action for logging/tracking
+ * Supports all 4-tier Risk Taxonomy action types
  */
 export function formatComplianceAction(actionType, metadata) {
   const timestamp = new Date(metadata.timestamp).toLocaleString();
 
   const actionMap = {
+    // Low (Approved) Risk Actions
     accept: 'Accepted Compliance',
+
+    // Moderate (Flagged) Risk Actions
     generateAffidavit: 'Generated Affidavit',
     requestApproval: 'Requested Manager Approval',
+
+    // High (Escalate) Risk Actions
+    escalateVP: 'Escalated to VP for Approval',
+    requestOverride: 'Requested VP Override',
+
+    // Critical (Blocked) Risk Actions
     escalate: 'Escalated to Compliance Officer',
     viewReport: 'Viewed Risk Report'
   };
@@ -174,9 +213,35 @@ export function formatComplianceAction(actionType, metadata) {
 
 /**
  * Get color scheme for a risk level
+ * Supports 4-tier Risk Taxonomy: critical, high, moderate, low
  */
 export function getRiskColorScheme(riskLevel) {
   const schemes = {
+    low: {
+      primary: '#22c55e',
+      light: '#86efac',
+      bg: 'rgba(34, 197, 94, 0.1)',
+      badge: 'green'
+    },
+    moderate: {
+      primary: '#eab308',
+      light: '#facc15',
+      bg: 'rgba(234, 179, 8, 0.1)',
+      badge: 'yellow'
+    },
+    high: {
+      primary: '#ea580c',
+      light: '#fed7aa',
+      bg: 'rgba(234, 88, 12, 0.1)',
+      badge: 'orange'
+    },
+    critical: {
+      primary: '#ef4444',
+      light: '#fca5a5',
+      bg: 'rgba(239, 68, 68, 0.1)',
+      badge: 'red'
+    },
+    // Legacy support for old naming
     approved: {
       primary: '#22c55e',
       light: '#86efac',
@@ -197,5 +262,5 @@ export function getRiskColorScheme(riskLevel) {
     }
   };
 
-  return schemes[riskLevel] || schemes.flagged;
+  return schemes[riskLevel] || schemes.moderate;
 }
