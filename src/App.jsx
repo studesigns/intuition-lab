@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import VoPlayer from './pages/VoPlayer';
-import Compliance from './pages/Compliance';
+import Dashboard from './pages/dashboard';
+import VoPlayer from './pages/vo-player';
+import Compliance from './pages/compliance';
 import './App.css';
 
 function App() {
