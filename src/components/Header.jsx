@@ -35,27 +35,34 @@ export default function Header({ searchQuery, setSearchQuery }) {
           <button
             onClick={() => navigate('/')}
             style={{
-              background: 'none',
-              border: 'none',
-              color: '#9ca3af',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              borderRadius: '0.5rem',
-              transition: 'all 0.3s ease',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.625rem 1.125rem',
+              background: 'rgba(30, 41, 59, 0.8)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '0.5rem',
+              color: '#cbd5e1',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#22d3ee';
-              e.currentTarget.style.backgroundColor = 'rgba(8, 145, 178, 0.1)';
+              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#9ca3af';
-              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.8)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.color = '#cbd5e1';
             }}
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
+            <span>Dashboard</span>
           </button>
           <div style={{
             width: '2.5rem',
