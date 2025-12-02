@@ -2,7 +2,13 @@
 
 ## Overview
 
-The **Compliance Confidence Scorecard** is a granular risk assessment component that replaces generic compliance alerts. It provides users with clear, actionable compliance decisions using a 3-tier traffic light system and context-specific action buttons.
+The **Compliance Confidence Scorecard** is a granular risk assessment component that replaces generic compliance alerts. It provides users with clear, actionable compliance decisions using a **4-tier Risk Taxonomy** traffic light system and context-specific action buttons.
+
+**4-Tier Risk Taxonomy**:
+- **🔴 CRITICAL (Red)**: Federal/local law violations, forbidden categories → BLOCKED
+- **🟠 HIGH (Orange)**: Hard limit violations, regulatory violations → ESCALATE TO VP
+- **🟡 MODERATE (Yellow)**: Missing documentation, minor procedural errors → REQUIRES REMEDIAL ACTION
+- **🟢 LOW (Green)**: Fully compliant, within acceptable discretionary thresholds → AUTO-APPROVED
 
 ---
 
@@ -12,38 +18,51 @@ The **Compliance Confidence Scorecard** is a granular risk assessment component 
 **Location**: `/src/components/ComplianceConfidenceScorecard.jsx`
 
 A React component that displays compliance risk assessments with:
-- 3-tier traffic light system (Approved/Flagged/Blocked)
-- Dynamic risk-specific action buttons
+- **4-tier traffic light system** (Low/Moderate/High/Critical)
+- Dynamic risk-specific action buttons (1-2 per risk level)
 - Collapsible details and source citations
-- Animated progress bar indicating confidence level
+- Animated progress bar showing confidence level (0-100%)
 
-### Risk Levels Explained
+### Risk Levels Explained (4-Tier Risk Taxonomy)
 
-#### 🟢 **Approved** (Green)
+#### 🟢 **LOW** (Green) - Approved
 - **Status**: Fully compliant, no issues
 - **Badge**: Green background with checkmark icon
-- **Description**: "This transaction meets all compliance requirements"
+- **Confidence Score**: 100% ✓
+- **Description**: "This transaction meets all compliance requirements."
 - **Available Actions**:
-  - ✓ Accept Compliance
-- **When It Appears**: When compliance_status = 'COMPLIANT' or response contains compliance keywords
+  - ✓ Accept Compliance (confirm acceptance)
+- **When It Appears**: Response contains "compliant", "allowed", "permitted", "approved", "within limits", "no issues" or status = 'LOW'
 
-#### 🟡 **Flagged** (Yellow)
-- **Status**: Compliant but requires documentation/approval
+#### 🟡 **MODERATE** (Yellow) - Flagged
+- **Status**: Compliant but requires documentation/approval to proceed
 - **Badge**: Yellow background with warning triangle icon
-- **Description**: "This transaction is compliant but requires additional documentation"
+- **Confidence Score**: 50%
+- **Description**: "This transaction requires additional documentation or approval before proceeding."
 - **Available Actions**:
   - 📄 Generate Affidavit (for missing documentation)
   - 📨 Request Approval (for manager sign-off)
-- **When It Appears**: When response contains "documentation", "requires review", "approval", "receipt", etc.
+- **When It Appears**: Response contains "documentation", "requires review", "approval", "receipt", "missing form", "affidavit", "procedural", "remedial" or status = 'MODERATE'
 
-#### 🔴 **Blocked** (Red)
-- **Status**: Hard violation, transaction rejected
-- **Badge**: Red background with alert icon
-- **Description**: "This transaction violates compliance policies and has been blocked"
+#### 🟠 **HIGH** (Orange) - Escalate
+- **Status**: Hard limit violation, requires VP approval to proceed
+- **Badge**: Orange background with alert icon
+- **Confidence Score**: 25%
+- **Description**: "This transaction exceeds hard limits and requires VP approval to proceed."
 - **Available Actions**:
-  - ⚡ Escalate to Compliance (create high-priority ticket)
-  - 📊 View Risk Report (detailed violation analysis)
-- **When It Appears**: When compliance_status = 'RISK DETECTED' or response contains "prohibited", "violat", "banned", etc.
+  - ⚡ Escalate to VP (request VP override approval)
+  - 📨 Request Override (formal override request)
+- **When It Appears**: Response contains "violates hard limit", "exceeds limit", "over 20%", "business class", "vp approval", "regulatory", "significant risk", "requires vp", "escalate to vp" or status = 'HIGH'
+
+#### 🔴 **CRITICAL** (Red) - Blocked
+- **Status**: Federal/local law violation or explicitly forbidden, transaction immediately rejected
+- **Badge**: Red background with alert icon
+- **Confidence Score**: 0%
+- **Description**: "This transaction violates federal/local law or explicitly forbidden policies and has been blocked."
+- **Available Actions**:
+  - ⚡ Escalate to Compliance (notify Compliance Officer, create high-priority ticket)
+  - 📊 View Risk Report (detailed violation analysis with policy references)
+- **When It Appears**: Response contains "bribery", "money laundering", "embezzlement", "fraud", "illegal", "federal", "law violation", "criminal", "gambling", "adult entertainment", "explicitly forbidden", "strictly prohibited" or status = 'CRITICAL'
 
 ---
 
@@ -51,11 +70,11 @@ A React component that displays compliance risk assessments with:
 
 ```javascript
 <ComplianceConfidenceScorecard
-  riskLevel="approved|flagged|blocked"        // Required
-  ruleTriggered="One-sentence rule summary"   // Required
-  details="Full compliance analysis text"     // Optional
-  sources={["policy section", "..."]}        // Optional array
-  onAction={(actionType, metadata) => {}}    // Optional callback
+  riskLevel="low|moderate|high|critical"     // Required (4-tier system)
+  ruleTriggered="One-sentence rule summary"  // Required
+  details="Full compliance analysis text"    // Optional
+  sources={["policy section", "..."]}       // Optional array
+  onAction={(actionType, metadata) => {}}   // Optional callback
 />
 ```
 
@@ -63,11 +82,11 @@ A React component that displays compliance risk assessments with:
 
 | Prop | Type | Description |
 |------|------|-------------|
-| **riskLevel** | 'approved' \| 'flagged' \| 'blocked' | Determines badge color, icon, and available actions |
-| **ruleTriggered** | string | One-sentence summary of specific rule (e.g., "Exceeds Gift Limit for Public Officials") |
+| **riskLevel** | 'low' \| 'moderate' \| 'high' \| 'critical' | 4-tier Risk Taxonomy classification. Determines badge color, icon, and available actions |
+| **ruleTriggered** | string | One-sentence summary of specific rule triggered (e.g., "Exceeds hard limit for purchase approval") |
 | **details** | string | Full compliance analysis - shown in collapsible section |
 | **sources** | string[] | Policy document sections referenced in the analysis |
-| **onAction** | function | Callback when user clicks action button |
+| **onAction** | function | Callback when user clicks action button. Receives (actionType, metadata) parameters |
 
 ---
 
@@ -88,32 +107,48 @@ const apiResponse = {
 
 const parsed = parseComplianceResponse(apiResponse);
 // Returns: {
-//   riskLevel: 'blocked',
-//   ruleTriggered: 'Violates restricted venue policy',
+//   riskLevel: 'critical',  // or 'high', 'moderate', 'low'
+//   ruleTriggered: 'Violates federal law - gift for business influence prohibited',
 //   details: 'cleaned analysis text',
-//   sources: [...]
+//   sources: [...],
+//   rawStatus: 'CRITICAL'
 // }
 ```
 
-### Risk Level Determination Algorithm
+### Risk Level Determination Algorithm (4-Tier Risk Taxonomy)
 
-The system analyzes both the `compliance_status` and response content:
+The system analyzes both the `compliance_status` and response content using strict classification:
 
 ```javascript
-// Hard violations (Blocked) - Highest priority
-if (answer includes 'prohibited' OR 'violates' OR 'banned'
-    OR status === 'RISK DETECTED') → 'blocked'
+// CRITICAL (Red) - Federal/local law violations - Highest priority
+if (answer includes 'bribery' OR 'money laundering' OR 'embezzlement'
+    OR 'fraud' OR 'illegal' OR 'federal' OR 'law violation' OR 'criminal'
+    OR 'gambling' OR 'adult entertainment' OR 'explicitly forbidden'
+    OR 'strictly prohibited' OR status === 'CRITICAL')
+  → 'critical'
 
-// Requires documentation (Flagged) - Medium priority
-else if (answer includes 'documentation' OR 'approval'
-         OR 'requires review' OR status === 'REQUIRES REVIEW') → 'flagged'
+// HIGH (Orange) - Hard limit violations - Requires VP approval
+else if (answer includes ('violates' AND 'hard limit') OR 'exceeds limit'
+         OR 'over 20%' OR 'business class' OR 'vp approval' OR 'regulatory'
+         OR 'significant risk' OR 'requires vp' OR 'escalate to vp'
+         OR status === 'HIGH')
+  → 'high'
 
-// Fully compliant (Approved) - Lowest priority
-else if (answer includes 'compliant' OR 'allowed'
-         OR 'approved' OR status === 'COMPLIANT') → 'approved'
+// MODERATE (Yellow) - Missing documentation/procedural - Requires remedial action
+else if (answer includes 'requires review' OR 'documentation' OR 'receipt'
+         OR 'missing form' OR 'affidavit' OR 'procedural' OR 'missing approval'
+         OR 'lost receipt' OR 'wrong channel' OR 'requires docs' OR 'remedial'
+         OR status === 'MODERATE')
+  → 'moderate'
 
-// Default
-else → 'flagged'
+// LOW (Green) - Fully compliant - Lowest priority
+else if (answer includes 'compliant' OR 'allowed' OR 'permitted'
+         OR 'approved' OR 'within limits' OR 'no issues'
+         OR status === 'LOW')
+  → 'low'
+
+// Default - When unclear, be conservative
+else → 'moderate'
 ```
 
 ### Rule Extraction
@@ -196,7 +231,7 @@ const aiMessage = {
   type: 'ai',
   message: data.answer,
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  compliance: parsedCompliance.riskLevel,      // 'approved'|'flagged'|'blocked'
+  compliance: parsedCompliance.riskLevel,      // 'low'|'moderate'|'high'|'critical' (4-tier system)
   sources: data.sources,
   ruleTriggered: parsedCompliance.ruleTriggered,
   details: parsedCompliance.details,
@@ -366,9 +401,10 @@ Actions:        Escalate to Compliance, View Risk Report
    └─ Action Buttons
    ↓
 5. User Selects Action
-   ├─ Accept (Green)
-   ├─ Generate/Request (Yellow)
-   └─ Escalate/Report (Red)
+   ├─ Accept (Low - Green)
+   ├─ Generate/Request (Moderate - Yellow)
+   ├─ Escalate VP/Override (High - Orange)
+   └─ Escalate/Report (Critical - Red)
    ↓
 6. System Logs Action
    ├─ Timestamp
@@ -387,12 +423,26 @@ Actions:        Escalate to Compliance, View Risk Report
 The Scorecard component logs compliance actions for audit purposes:
 
 ```javascript
+// Example audit log for CRITICAL (Red) transaction
 {
   action: "Escalated to Compliance Officer",
-  riskLevel: "blocked",
+  riskLevel: "critical",
+  color: "RED",
   rule: "Bribes and gifts for influence are prohibited",
   timestamp: "Dec 2, 2025, 2:30:45 PM",
-  questionAsked: "Can I provide a gift to a vendor..."
+  questionAsked: "Can I provide a gift to a vendor to influence contract...",
+  complianceStatus: "BLOCKED"
+}
+
+// Example audit log for HIGH (Orange) transaction
+{
+  action: "Escalated to VP for Approval",
+  riskLevel: "high",
+  color: "ORANGE",
+  rule: "Purchase amount exceeds VP spending limit by 25%",
+  timestamp: "Dec 2, 2025, 2:25:30 PM",
+  questionAsked: "Can I approve a $15,000 marketing purchase?",
+  complianceStatus: "REQUIRES_VP_APPROVAL"
 }
 ```
 
@@ -468,19 +518,30 @@ The `onAction` callback can trigger:
 ## 📞 Troubleshooting
 
 ### "Component not rendering"
-- Verify `riskLevel` is 'approved', 'flagged', or 'blocked'
+- Verify `riskLevel` is one of: 'low', 'moderate', 'high', or 'critical'
 - Check that `parseComplianceResponse()` is called correctly
 - Ensure imports are correct
+- Check console for any missing prop warnings
 
 ### "Actions not triggering"
 - Verify `onAction` callback is provided
 - Check browser console for errors
-- Confirm `actionType` matches case exactly
+- Confirm `actionType` matches expected values: 'accept', 'generateAffidavit', 'requestApproval', 'escalateVP', 'requestOverride', 'escalate', 'viewReport'
+- Ensure Compliance.jsx action handler includes all action types
 
 ### "Wrong risk level detected"
-- Check API response includes `compliance_status`
-- Verify response content matches pattern keywords
-- Test with explicit risk level override
+- Check API response includes `compliance_status` field
+- Verify response content matches Risk Taxonomy keywords:
+  - CRITICAL: bribery, money laundering, illegal, federal law, gambling, adult entertainment
+  - HIGH: violates hard limit, exceeds limit, business class, vp approval, regulatory
+  - MODERATE: documentation, receipt, missing form, affidavit, procedural, remedial
+  - LOW: compliant, allowed, permitted, approved, within limits
+- Test with explicit risk level override by passing riskLevel prop directly
+
+### "Backend API not returning new 4-tier format"
+- Verify backend system prompt in main.py includes 4-tier Risk Taxonomy (lines 62-161)
+- Check that API response includes `compliance_status` with values: 'CRITICAL', 'HIGH', 'MODERATE', 'LOW'
+- Ensure parser can handle both new 4-tier and legacy 3-tier responses
 
 ---
 
