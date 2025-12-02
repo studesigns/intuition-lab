@@ -14,15 +14,31 @@ export function parseComplianceResponse(response) {
   const status = response.compliance_status || 'REQUIRES REVIEW';
   const sources = response.sources || [];
 
-  // ===== UPDATED: Use violation_summary from backend if available =====
+  // ===== CRITICAL FIX: Use JSON risk_level from backend if available =====
+  // Backend now returns risk_classification with risk_level field
+  // Must prefer this over text parsing to prevent UI state mismatch
+  let riskLevel = 'moderate'; // default
+
+  if (response.risk_classification && response.risk_classification.risk_level) {
+    // Map backend risk_level to component format
+    const backendLevel = response.risk_classification.risk_level.toLowerCase();
+    if (['critical', 'high', 'moderate', 'low'].includes(backendLevel)) {
+      riskLevel = backendLevel;
+    }
+  } else {
+    // Fallback to text parsing only if backend doesn't provide JSON
+    riskLevel = determineRiskLevel(answer, status);
+  }
+
+  // ===== Use violation_summary from backend if available =====
   // Falls back to text parsing if backend doesn't provide violation_summary
   let ruleTriggered = response.violation_summary
     ? response.violation_summary
     : extractRuleTriggered(answer);
 
   return {
-    riskLevel: determineRiskLevel(answer, status),
-    ruleTriggered: ruleTriggered,  // Now from backend JSON, not text parsing
+    riskLevel: riskLevel,  // Now from backend JSON risk_classification, not text parsing
+    ruleTriggered: ruleTriggered,
     details: cleanupDetails(answer),
     sources: sources,
     rawStatus: status

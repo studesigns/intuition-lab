@@ -262,7 +262,10 @@ export default function ComplianceConfidenceScorecard({
                 fontSize: '0.875rem',
                 color: '#cbd5e1',
                 lineHeight: '1.6',
-                whiteSpace: 'pre-wrap',
+                whiteSpace: 'normal',  // Allow wrapping, not pre-wrap
+                wordBreak: 'break-words',  // Break long words
+                height: 'auto',  // Dynamic height
+                overflow: 'visible',  // No hidden overflow
               }}>
                 {details}
               </div>
