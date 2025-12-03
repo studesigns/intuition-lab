@@ -4,6 +4,36 @@
  */
 
 /**
+ * Safely parse JSON response, stripping markdown wrappers
+ * @param {string|Object} rawResponse - Raw response from API
+ * @returns {Object} Parsed JSON object
+ */
+function safeParseJSON(rawResponse) {
+  // If already an object, return it
+  if (typeof rawResponse === 'object' && rawResponse !== null) {
+    return rawResponse;
+  }
+
+  // If string, try to parse
+  if (typeof rawResponse === 'string') {
+    try {
+      // Strip markdown code blocks if present
+      let cleaned = rawResponse
+        .replace(/```json\s*/g, '')
+        .replace(/```\s*/g, '')
+        .trim();
+
+      return JSON.parse(cleaned);
+    } catch (e) {
+      console.error('JSON parse failed:', e);
+      return null;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Parse compliance status and extract rule details
  * ROBUST PARSER: Handles raw JSON, markdown JSON, and text fallback
  *
@@ -19,6 +49,11 @@ export function parseComplianceResponse(response) {
     let details = '';
     let status = 'REQUIRES REVIEW';
     const sources = response.sources || [];
+
+    // Parse risk_classification if it's a JSON string
+    if (response.risk_classification && typeof response.risk_classification === 'string') {
+      response.risk_classification = safeParseJSON(response.risk_classification);
+    }
 
     // Strategy 1: Check if response contains raw JSON structure
     if (response.risk_level) {
