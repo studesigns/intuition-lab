@@ -1,5 +1,10 @@
 /* Compliance Engine Styling - Dashboard-inspired with Aurora Orbs */
 
+/* Override aurora-container z-index to bring orbs forward */
+.aurora-container {
+  z-index: 1 !important;
+}
+
 .compliance-container {
   min-height: 100vh;
   display: flex;
