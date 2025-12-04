@@ -12,8 +12,10 @@ export default function VideoRow({
   showAdminControls = false,
 }) {
   const scrollRef = useRef(null);
+  const rowContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isRowHovered, setIsRowHovered] = useState(false);
 
   // Check scroll position to show/hide arrows
   const checkScroll = useCallback(() => {
@@ -61,49 +63,54 @@ export default function VideoRow({
         {title}
       </h2>
 
-      {/* Scroll Container with Arrows */}
-      <div style={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem',
-      }}>
-        {/* Left Arrow Button */}
+      {/* Scroll Container with Netflix-Style Vignette Buttons */}
+      <div
+        ref={rowContainerRef}
+        onMouseEnter={() => setIsRowHovered(true)}
+        onMouseLeave={() => setIsRowHovered(false)}
+        style={{
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'stretch',
+          overflow: 'hidden',
+          borderRadius: '0.5rem',
+        }}
+      >
+        {/* Left Vignette Button */}
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
             style={{
               position: 'absolute',
-              left: '-2.5rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              width: '48px',
-              height: '48px',
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: '56px',
+              background: 'linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent)',
+              border: 'none',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              color: '#ffffff',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.boxShadow = '0 0 25px rgba(8, 145, 178, 0.6)';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+              zIndex: 40,
+              opacity: isRowHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
             }}
           >
-            <ChevronLeft size={24} strokeWidth={3} />
+            <ChevronLeft
+              size={32}
+              strokeWidth={3}
+              color="#ffffff"
+              style={{
+                transition: 'transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            />
           </button>
         )}
 
@@ -156,42 +163,41 @@ export default function VideoRow({
           )}
         </div>
 
-        {/* Right Arrow Button */}
+        {/* Right Vignette Button */}
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
             style={{
               position: 'absolute',
-              right: '-2.5rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10,
-              width: '48px',
-              height: '48px',
-              background: 'rgba(255, 255, 255, 0.15)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '56px',
+              background: 'linear-gradient(to left, rgba(0, 0, 0, 0.7), transparent)',
+              border: 'none',
+              cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              color: '#ffffff',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-              e.currentTarget.style.boxShadow = '0 0 25px rgba(8, 145, 178, 0.6)';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+              zIndex: 40,
+              opacity: isRowHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
             }}
           >
-            <ChevronRight size={24} strokeWidth={3} />
+            <ChevronRight
+              size={32}
+              strokeWidth={3}
+              color="#ffffff"
+              style={{
+                transition: 'transform 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            />
           </button>
         )}
       </div>
