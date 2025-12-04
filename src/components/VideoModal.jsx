@@ -1,11 +1,67 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { formatDuration, formatFileSize } from '../utils/cloudinaryHelper';
 
 export default function VideoModal({ video, onClose }) {
   const videoRef = useRef(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Reset error when video changes
+    setError(null);
+  }, [video?.id]);
 
   if (!video) return null;
+
+  if (error) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: '1rem',
+        }}
+        onClick={onClose}
+      >
+        <div
+          style={{
+            backgroundColor: '#0f172a',
+            border: '1px solid rgba(220, 38, 38, 0.4)',
+            borderRadius: '16px',
+            padding: '2rem',
+            maxWidth: '500px',
+            textAlign: 'center',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 style={{ color: '#ffffff', marginBottom: '1rem' }}>Error Loading Video</h2>
+          <p style={{ color: '#cbd5e1', marginBottom: '1.5rem' }}>{error}</p>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#0891b2',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600',
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -237,68 +293,74 @@ export default function VideoModal({ video, onClose }) {
               </div>
 
               {/* Resolution */}
-              <div>
-                <p style={{
-                  fontSize: '0.75rem',
-                  color: '#9ca3af',
-                  margin: '0 0 0.25rem 0',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
-                  Resolution
-                </p>
-                <p style={{
-                  fontSize: '1rem',
-                  color: '#e2e8f0',
-                  margin: 0,
-                  fontWeight: '600',
-                }}>
-                  {video.width}x{video.height}
-                </p>
-              </div>
+              {video.width && video.height && (
+                <div>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#9ca3af',
+                    margin: '0 0 0.25rem 0',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                  }}>
+                    Resolution
+                  </p>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#e2e8f0',
+                    margin: 0,
+                    fontWeight: '600',
+                  }}>
+                    {video.width}x{video.height}
+                  </p>
+                </div>
+              )}
 
               {/* File Size */}
-              <div>
-                <p style={{
-                  fontSize: '0.75rem',
-                  color: '#9ca3af',
-                  margin: '0 0 0.25rem 0',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
-                  File Size
-                </p>
-                <p style={{
-                  fontSize: '1rem',
-                  color: '#e2e8f0',
-                  margin: 0,
-                  fontWeight: '600',
-                }}>
-                  {formatFileSize(video.fileSize)}
-                </p>
-              </div>
+              {video.fileSize && (
+                <div>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#9ca3af',
+                    margin: '0 0 0.25rem 0',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                  }}>
+                    File Size
+                  </p>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#e2e8f0',
+                    margin: 0,
+                    fontWeight: '600',
+                  }}>
+                    {formatFileSize(video.fileSize)}
+                  </p>
+                </div>
+              )}
 
               {/* Format */}
-              <div>
-                <p style={{
-                  fontSize: '0.75rem',
-                  color: '#9ca3af',
-                  margin: '0 0 0.25rem 0',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.3px',
-                }}>
-                  Format
-                </p>
-                <p style={{
-                  fontSize: '1rem',
-                  color: '#e2e8f0',
-                  margin: 0,
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                }}>
-                  {video.format}
-                </p>
-              </div>
+              {video.format && (
+                <div>
+                  <p style={{
+                    fontSize: '0.75rem',
+                    color: '#9ca3af',
+                    margin: '0 0 0.25rem 0',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                  }}>
+                    Format
+                  </p>
+                  <p style={{
+                    fontSize: '1rem',
+                    color: '#e2e8f0',
+                    margin: 0,
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}>
+                    {video.format}
+                  </p>
+                </div>
+              )}
 
               {/* Upload Date */}
               {video.createdAt && (
@@ -318,11 +380,18 @@ export default function VideoModal({ video, onClose }) {
                     margin: 0,
                     fontWeight: '600',
                   }}>
-                    {new Date(video.createdAt.toDate?.() || video.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                    {(() => {
+                      try {
+                        const dateObj = video.createdAt.toDate?.() || video.createdAt;
+                        return new Date(dateObj).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        });
+                      } catch (e) {
+                        return 'Date unavailable';
+                      }
+                    })()}
                   </p>
                 </div>
               )}
