@@ -10,10 +10,14 @@ export default function VideoHeader() {
   const { isAdmin, logout, setShowLoginModal } = useContext(VoiceContext);
 
   return (
-    <header className="sticky top-0 z-50" style={{
+    <header style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 50,
       width: '100%',
       background: 'rgba(15, 23, 42, 0.8)',
       backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
     }}>
       <div style={{
