@@ -2,17 +2,27 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import VoPlayer from './pages/vo-player';
 import Compliance from './pages/compliance';
+import VisualVault from './pages/visual-vault';
+import VisualVaultAdmin from './pages/visual-vault-admin';
+import { VoiceProvider } from './context/VoiceContext';
+import { VideoProvider } from './context/VideoContext';
 import './App.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/vo-player" element={<VoPlayer />} />
-        <Route path="/compliance" element={<Compliance />} />
-      </Routes>
-    </Router>
+    <VoiceProvider>
+      <VideoProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/vo-player" element={<VoPlayer />} />
+            <Route path="/compliance" element={<Compliance />} />
+            <Route path="/visual-vault" element={<VisualVault />} />
+            <Route path="/visual-vault/admin" element={<VisualVaultAdmin />} />
+          </Routes>
+        </Router>
+      </VideoProvider>
+    </VoiceProvider>
   );
 }
 
