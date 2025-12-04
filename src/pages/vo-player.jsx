@@ -36,6 +36,8 @@ function Library() {
   const [playingVoiceId, setPlayingVoiceId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingVoice, setEditingVoice] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const categoryRefs = useRef({});
   const audioRef = useRef(new Audio());
 
   // Handle play/pause toggle
@@ -75,7 +77,7 @@ function Library() {
     setShowAddModal(true);
   };
 
-  // Group voices by category (tag)
+  // Group voices by category (tag) and filter by active category
   const voicesByCategory = () => {
     const grouped = {};
     voices.forEach(voice => {
@@ -88,8 +90,25 @@ function Library() {
     return grouped;
   };
 
-  const voiceGroups = voicesByCategory();
-  const categories = Object.keys(voiceGroups);
+  const allVoiceGroups = voicesByCategory();
+
+  // Filter based on active category
+  let voiceGroups = {};
+  let categories = [];
+
+  if (activeCategory === 'All') {
+    voiceGroups = allVoiceGroups;
+    categories = Object.keys(allVoiceGroups);
+  } else {
+    // Only show voices from the active category
+    if (allVoiceGroups[activeCategory]) {
+      voiceGroups[activeCategory] = allVoiceGroups[activeCategory];
+      categories = [activeCategory];
+    }
+  }
+
+  // Get all unique categories for the pill buttons
+  const allCategories = Object.keys(allVoiceGroups);
 
   // Get featured voice (first one or random)
   const featuredVoice = voices.length > 0 ? voices[0] : null;
@@ -302,6 +321,107 @@ function Library() {
           </motion.div>
         )}
 
+        {/* Category Filter Pills - Sticky Sub-navbar */}
+        {allCategories.length > 0 && (
+          <div
+            style={{
+              position: 'sticky',
+              top: '80px',
+              zIndex: 45,
+              background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.8), transparent)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              padding: '1.5rem 2rem',
+              marginBottom: '2rem',
+            }}
+          >
+            <div
+              style={{
+                maxWidth: '1400px',
+                margin: '0 auto',
+                display: 'flex',
+                gap: '0.75rem',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+              className="hide-scrollbar"
+            >
+              {/* "All" Pill */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveCategory('All')}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  borderRadius: '9999px',
+                  border: activeCategory === 'All' ? 'none' : '1px solid rgba(255, 255, 255, 0.4)',
+                  backgroundColor: activeCategory === 'All' ? '#ffffff' : 'transparent',
+                  color: activeCategory === 'All' ? '#000000' : '#ffffff',
+                  fontWeight: '600',
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  if (activeCategory !== 'All') {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeCategory !== 'All') {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                  }
+                }}
+              >
+                All
+              </motion.button>
+
+              {/* Category Pills */}
+              {allCategories.map(category => (
+                <motion.button
+                  key={category}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveCategory(category)}
+                  style={{
+                    padding: '0.5rem 1.25rem',
+                    borderRadius: '9999px',
+                    border: activeCategory === category ? 'none' : '1px solid rgba(255, 255, 255, 0.4)',
+                    backgroundColor: activeCategory === category ? '#ffffff' : 'transparent',
+                    color: activeCategory === category ? '#000000' : '#ffffff',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeCategory !== category) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeCategory !== category) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                    }
+                  }}
+                >
+                  {category}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main Content Area */}
         <div
           style={{
@@ -364,7 +484,43 @@ function Library() {
             </motion.div>
           )}
 
-          {/* Empty State */}
+          {/* Empty State - No voices in selected category */}
+          {!loading && activeCategory !== 'All' && categories.length === 0 && (
+            <div style={{
+              textAlign: 'center',
+              paddingTop: '5rem',
+              paddingBottom: '5rem',
+            }}>
+              <div style={{
+                width: '4rem',
+                height: '4rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <span style={{ fontSize: '1.75rem' }}>🎤</span>
+              </div>
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#ffffff',
+                marginBottom: '0.5rem',
+              }}>
+                No voices in this category
+              </h3>
+              <p style={{
+                color: '#9ca3af',
+                fontSize: '0.875rem',
+              }}>
+                Nothing here yet... stay tuned.
+              </p>
+            </div>
+          )}
+
+          {/* Empty State - No voices at all */}
           {!loading && voices.length === 0 && (
             <div style={{
               textAlign: 'center',
@@ -416,6 +572,10 @@ function Library() {
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>

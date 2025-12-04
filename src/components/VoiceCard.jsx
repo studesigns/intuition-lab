@@ -1,7 +1,17 @@
 import { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Edit2, Trash2 } from 'lucide-react';
-import { VoiceContext } from '../context/VoiceContext';
+import { VoiceContext, LANGUAGES } from '../context/VoiceContext';
+
+// Helper function to convert country code to flag emoji
+const getCountryFlagEmoji = (countryCode) => {
+  if (!countryCode) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt());
+  return String.fromCodePoint(...codePoints);
+};
 
 export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
   const { isAdmin, deleteVoice } = useContext(VoiceContext);
@@ -60,48 +70,88 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
         />
       )}
 
-      {/* Centered Play/Pause Button */}
-      <motion.button
-        onClick={() => onTogglePlay(voice)}
+      {/* Centered Play/Pause Button with Sound Wave Bars */}
+      <div
         style={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 2,
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: '#0891b2',
-          border: 'none',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          boxShadow: isPlaying
-            ? '0 0 30px rgba(8, 145, 178, 0.8)'
-            : '0 0 15px rgba(8, 145, 178, 0.4)',
-        }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = '#0e7490';
-          e.currentTarget.style.boxShadow = '0 0 40px rgba(8, 145, 178, 1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = '#0891b2';
-          e.currentTarget.style.boxShadow = isPlaying
-            ? '0 0 30px rgba(8, 145, 178, 0.8)'
-            : '0 0 15px rgba(8, 145, 178, 0.4)';
+          gap: '0.75rem',
         }}
       >
-        {isPlaying ? (
-          <Pause size={32} color="#ffffff" fill="#ffffff" />
-        ) : (
-          <Play size={32} color="#ffffff" fill="#ffffff" />
+        <motion.button
+          onClick={() => onTogglePlay(voice)}
+          style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: '#0891b2',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            boxShadow: isPlaying
+              ? '0 0 30px rgba(8, 145, 178, 0.8)'
+              : '0 0 15px rgba(8, 145, 178, 0.4)',
+          }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#0e7490';
+            e.currentTarget.style.boxShadow = '0 0 40px rgba(8, 145, 178, 1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = '#0891b2';
+            e.currentTarget.style.boxShadow = isPlaying
+              ? '0 0 30px rgba(8, 145, 178, 0.8)'
+              : '0 0 15px rgba(8, 145, 178, 0.4)';
+          }}
+        >
+          {isPlaying ? (
+            <Pause size={32} color="#ffffff" fill="#ffffff" />
+          ) : (
+            <Play size={32} color="#ffffff" fill="#ffffff" />
+          )}
+        </motion.button>
+
+        {/* Animated Sound Wave Bars - Only show when playing */}
+        {isPlaying && (
+          <div
+            style={{
+              display: 'flex',
+              gap: '4px',
+              alignItems: 'flex-end',
+              height: '40px',
+            }}
+          >
+            {[0, 1, 2, 3, 4].map((index) => (
+              <motion.div
+                key={index}
+                style={{
+                  width: '3px',
+                  background: '#0891b2',
+                  borderRadius: '2px',
+                }}
+                animate={{
+                  height: ['8px', '24px', '16px', '20px', '12px', '8px'],
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  delay: index * 0.1,
+                }}
+              />
+            ))}
+          </div>
         )}
-      </motion.button>
+      </div>
 
       {/* Metadata Section - Bottom */}
       <div
@@ -134,7 +184,7 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
           {voice.name}
         </h3>
 
-        {/* Details */}
+        {/* Flag + Language + Accent Details */}
         <p
           style={{
             fontSize: '0.75rem',
@@ -143,9 +193,19 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
+            letterSpacing: '0.5px',
           }}
         >
-          {voice.accent} • {voice.language}
+          {(() => {
+            // Find the language entry to get country code
+            const langEntry = LANGUAGES.find(
+              l => l.name.toLowerCase() === voice.language.toLowerCase()
+            );
+            const countryCode = langEntry?.countryCode || '';
+            const flagEmoji = getCountryFlagEmoji(countryCode);
+
+            return `${flagEmoji} ${voice.language} • ${voice.accent}`;
+          })()}
         </p>
       </div>
 
