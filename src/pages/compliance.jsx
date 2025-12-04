@@ -182,18 +182,32 @@ export default function Compliance() {
         headers: { 'Content-Type': 'application/json' }
       });
 
+      console.log('Delete response status:', response.status, response.statusText);
+
+      // Accept both 200 and 204 (some servers return No Content)
       if (!response.ok) {
-        throw new Error(`Delete failed: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Delete error response:', errorText);
+        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      let data = {};
+      try {
+        const responseText = await response.text();
+        if (responseText) {
+          data = JSON.parse(responseText);
+        }
+      } catch (parseErr) {
+        console.warn('Could not parse delete response as JSON, but deletion succeeded');
+      }
+
       console.log('Document deleted:', data);
 
       // Show success message
       setConversation(prev => [...prev, {
         id: prev.length + 1,
         type: 'system',
-        message: `Document "${policy.name}" deleted successfully (${data.chunks_deleted} chunks removed)`,
+        message: `Document "${policy.name}" deleted successfully${data.chunks_deleted ? ` (${data.chunks_deleted} chunks removed)` : ''}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
 
