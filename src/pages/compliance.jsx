@@ -334,6 +334,7 @@ export default function Compliance() {
           cursor: 'pointer',
           transition: 'all 0.3s ease',
           zIndex: 100,
+          pointerEvents: 'auto',
         }}
         whileHover={{
           background: 'rgba(30, 41, 59, 0.95)',
@@ -359,7 +360,8 @@ export default function Compliance() {
         height: 'calc(100vh - 100px)',
         marginTop: '100px',
         maxWidth: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        pointerEvents: 'none'
       }}>
 
         {/* Left Panel: Document Vault (30%) */}
@@ -375,6 +377,7 @@ export default function Compliance() {
             overflow: 'hidden',
             zIndex: 10,
             position: 'relative',
+            pointerEvents: 'auto',
           }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -635,6 +638,7 @@ export default function Compliance() {
             overflow: 'hidden',
             zIndex: 10,
             position: 'relative',
+            pointerEvents: 'auto',
           }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
