@@ -314,69 +314,53 @@ export default function Compliance() {
 
       <TechNodes />
 
-      {/* Main Container with Header */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        maxWidth: '100%',
-        overflow: 'hidden',
-      }}>
-        {/* Header with Back Button */}
-        <div style={{
-          padding: '0.75rem 1.5rem',
-          background: 'rgba(15, 23, 42, 0.9)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      {/* Fixed Return to Dashboard Button */}
+      <motion.button
+        onClick={() => navigate('/')}
+        style={{
+          position: 'fixed',
+          top: '1rem',
+          left: '1.5rem',
           display: 'flex',
           alignItems: 'center',
-          minHeight: '50px',
-          zIndex: 50,
-        }}>
-          <motion.button
-            onClick={() => navigate('/')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1.25rem',
-              background: 'rgba(30, 41, 59, 0.8)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '8px',
-              color: '#cbd5e1',
-              fontSize: '0.8rem',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              pointerEvents: 'auto',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.8)';
-              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-            }}
-          >
-            <ArrowLeft size={16} />
-            Dashboard
-          </motion.button>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="compliance-container" style={{
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          flex: 1,
-          maxWidth: '100%',
-          overflow: 'hidden',
+          gap: '0.5rem',
+          padding: '0.5rem 1.25rem',
+          background: 'rgba(30, 41, 59, 0.9)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '8px',
+          color: '#cbd5e1',
+          fontSize: '0.8rem',
+          fontWeight: '500',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          zIndex: 100,
           pointerEvents: 'auto',
-          position: 'relative',
-        }}>
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
+          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.9)';
+          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        }}
+      >
+        <ArrowLeft size={16} />
+        Dashboard
+      </motion.button>
+
+      {/* Main Content Area */}
+      <div className="compliance-container" style={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        height: 'calc(100vh - 0px)',
+        maxWidth: '100%',
+        overflow: 'hidden',
+        pointerEvents: 'auto',
+        position: 'relative',
+      }}>
 
         {/* Left Panel: Document Vault - Collapsible */}
         <motion.div
@@ -909,7 +893,6 @@ export default function Compliance() {
             </motion.button>
           </div>
         </motion.div>
-        </div>
       </div>
     </>
   );
