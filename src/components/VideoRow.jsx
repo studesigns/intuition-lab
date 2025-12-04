@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import VideoCard from './VideoCard';
 
@@ -16,13 +16,14 @@ export default function VideoRow({
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Check scroll position to show/hide arrows
-  const checkScroll = () => {
-    if (scrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  const checkScroll = useCallback(() => {
+    if (!scrollRef.current) {
+      return;
     }
-  };
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setCanScrollLeft(scrollLeft > 0);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  }, []);
 
   const scroll = (direction) => {
     const scrollAmount = 400; // pixels
@@ -37,9 +38,13 @@ export default function VideoRow({
   };
 
   // Check scroll position on mount and when videos change
-  if (scrollRef.current) {
-    checkScroll();
-  }
+  useEffect(() => {
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      checkScroll();
+    }, 0);
+    return () => clearTimeout(timeoutId);
+  }, [checkScroll, videos]);
 
   return (
     <div style={{
