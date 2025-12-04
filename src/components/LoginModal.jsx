@@ -1,12 +1,19 @@
 import { useState, useContext } from 'react';
 import { VoiceContext } from '../context/VoiceContext';
 
-export default function LoginModal({ subtitle = 'Sign in to manage voices' }) {
+export default function LoginModal({ subtitle = 'Sign in to manage voices', onCancel = null }) {
   const { showLoginModal, setShowLoginModal, login } = useContext(VoiceContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const handleCancel = () => {
+    setShowLoginModal(false);
+    if (onCancel) {
+      onCancel();
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -179,7 +186,7 @@ export default function LoginModal({ subtitle = 'Sign in to manage voices' }) {
             </button>
             <button
               type="button"
-              onClick={() => setShowLoginModal(false)}
+              onClick={handleCancel}
               style={{
                 width: '100%',
                 padding: '12px',

@@ -97,7 +97,10 @@ export default function VisualVaultAdmin() {
       <TechNodes />
 
       {/* Login Modal */}
-      <LoginModal subtitle="Sign in to manage videos" />
+      <LoginModal
+        subtitle="Sign in to manage videos"
+        onCancel={() => navigate('/visual-vault')}
+      />
 
       {/* Header */}
       <VideoHeader />
