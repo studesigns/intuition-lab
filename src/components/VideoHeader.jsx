@@ -11,14 +11,16 @@ export default function VideoHeader() {
 
   return (
     <header style={{
-      position: 'sticky',
+      position: 'fixed',
       top: 0,
+      left: 0,
+      right: 0,
       zIndex: 50,
       width: '100%',
-      background: 'rgba(15, 23, 42, 0.8)',
+      background: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent)',
       backdropFilter: 'blur(12px)',
       WebkitBackdropFilter: 'blur(12px)',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      borderBottom: 'none',
     }}>
       <div style={{
         maxWidth: '1200px',

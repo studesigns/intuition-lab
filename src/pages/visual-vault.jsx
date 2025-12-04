@@ -26,6 +26,15 @@ const itemVariants = {
   },
 };
 
+// Utility: Duplicate video for demo purposes
+const duplicateVideoForDemo = (video, count = 10) => {
+  if (!video) return [];
+  return Array.from({ length: count }, (_, i) => ({
+    ...video,
+    id: `${video.id}-demo-${i}`,
+  }));
+};
+
 export default function VisualVault() {
   const { videos, featuredVideos, loading } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -41,17 +50,21 @@ export default function VisualVault() {
   const createCategoryRows = () => {
     const rows = {};
 
-    // If we have featured videos, create special categories
+    // If we have featured videos, create special categories with demo duplication
     if (featuredVideos.length > 0) {
-      rows['Trending'] = [featuredVideos[0]];
-      rows['New Releases'] = [featuredVideos[0]];
+      rows['Trending Now'] = duplicateVideoForDemo(featuredVideos[0], 10);
+      rows['New Releases'] = duplicateVideoForDemo(featuredVideos[0], 8);
     }
 
-    // Group videos by industry
+    // Group videos by industry (with demo duplication if low count)
     INDUSTRIES.forEach(industry => {
       const industryVideos = videos.filter(v => v.industries?.includes(industry));
       if (industryVideos.length > 0) {
-        rows[industry] = industryVideos;
+        // If only 1-2 videos, duplicate them for demo purposes
+        const displayVideos = industryVideos.length <= 2
+          ? duplicateVideoForDemo(industryVideos[0], 10)
+          : industryVideos;
+        rows[industry] = displayVideos;
       }
     });
 
@@ -122,6 +135,7 @@ export default function VisualVault() {
         style={{
           position: 'relative',
           zIndex: 10,
+          paddingTop: '80px',
         }}
       >
         {/* Hero Section */}
@@ -323,48 +337,64 @@ export default function VisualVault() {
                 pointerEvents: 'none',
               }}
             />
+
+            {/* Category Pill Selectors - Overlaid on Hero at Bottom-Left */}
+            {categories.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                style={{
+                  position: 'absolute',
+                  bottom: '120px',
+                  left: '3rem',
+                  zIndex: 3,
+                  display: 'flex',
+                  gap: '0.75rem',
+                  flexWrap: 'wrap',
+                  maxWidth: '600px',
+                }}
+              >
+                {categories.map(category => (
+                  <motion.button
+                    key={category}
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setActiveCategory(category)}
+                    style={{
+                      padding: '0.5rem 1.25rem',
+                      borderRadius: '9999px',
+                      border: activeCategory === category ? 'none' : '1px solid rgba(255, 255, 255, 0.4)',
+                      backgroundColor: activeCategory === category ? '#ffffff' : 'rgba(30, 41, 59, 0.5)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      color: activeCategory === category ? '#000000' : '#ffffff',
+                      fontWeight: '600',
+                      fontSize: '0.85rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeCategory !== category) {
+                        e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.7)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeCategory !== category) {
+                        e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.5)';
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                      }
+                    }}
+                  >
+                    {category}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
           </motion.div>
         )}
 
-        {/* Category Filter Navigation */}
-        {categories.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            style={{
-              paddingX: '3rem',
-              paddingY: '2rem',
-              display: 'flex',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              maxWidth: '1400px',
-              margin: '0 auto',
-            }}
-          >
-            {categories.map(category => (
-              <motion.button
-                key={category}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveCategory(category)}
-                style={{
-                  padding: '0.5rem 1.5rem',
-                  borderRadius: '9999px',
-                  border: activeCategory === category ? 'none' : '2px solid rgba(255, 255, 255, 0.5)',
-                  backgroundColor: activeCategory === category ? '#ffffff' : 'transparent',
-                  color: activeCategory === category ? '#000000' : '#ffffff',
-                  fontWeight: '600',
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                {category}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
 
         {/* Category Rows */}
         <motion.div
