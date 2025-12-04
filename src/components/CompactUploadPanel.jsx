@@ -217,7 +217,7 @@ export default function CompactUploadPanel({ onUploadSuccess, onEditModeChange, 
         {/* LEFT COLUMN: Upload Zone OR Video Preview */}
         <div style={{
           borderRadius: '12px',
-          padding: uploadedFile ? '1rem' : '2rem',
+          padding: (uploadedFile || editingVideo) ? '1rem' : '2rem',
           textAlign: 'center',
           transition: 'all 0.3s ease',
           aspectRatio: '1',
@@ -225,15 +225,15 @@ export default function CompactUploadPanel({ onUploadSuccess, onEditModeChange, 
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          border: uploadedFile ? '1px solid rgba(8, 145, 178, 0.3)' : (dragActive ? '2px solid #0891b2' : '2px dashed rgba(255, 255, 255, 0.2)'),
-          background: uploadedFile ? 'rgba(8, 145, 178, 0.08)' : (dragActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent'),
-          cursor: uploadedFile ? 'default' : 'pointer',
+          border: (uploadedFile || editingVideo) ? '1px solid rgba(8, 145, 178, 0.3)' : (dragActive ? '2px solid #0891b2' : '2px dashed rgba(255, 255, 255, 0.2)'),
+          background: (uploadedFile || editingVideo) ? 'rgba(8, 145, 178, 0.08)' : (dragActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent'),
+          cursor: (uploadedFile || editingVideo) ? 'default' : 'pointer',
           overflow: 'hidden',
         }}
-          {...(uploadedFile ? {} : { onDragEnter: handleDrag, onDragLeave: handleDrag, onDragOver: handleDrag, onDrop: handleDrop })}
+          {...((uploadedFile || editingVideo) ? {} : { onDragEnter: handleDrag, onDragLeave: handleDrag, onDragOver: handleDrag, onDrop: handleDrop })}
         >
-          {/* IF NO FILE: Show Drop Zone */}
-          {!uploadedFile && (
+          {/* IF NO FILE AND NOT EDITING: Show Drop Zone */}
+          {!uploadedFile && !editingVideo && (
             <>
               <input
                 type="file"
@@ -338,6 +338,86 @@ export default function CompactUploadPanel({ onUploadSuccess, onEditModeChange, 
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* IF EDITING: Show Existing Video Thumbnail + Metadata */}
+          {editingVideo && !uploadedFile && (
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: '0.75rem',
+            }}>
+              {/* Existing Video Thumbnail */}
+              <img
+                src={editingVideo.thumbnailUrl}
+                alt={editingVideo.title}
+                style={{
+                  width: '100%',
+                  borderRadius: '8px',
+                  objectFit: 'cover',
+                  aspectRatio: '16 / 9',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                }}
+              />
+
+              {/* Video Metadata */}
+              <div style={{
+                width: '100%',
+                fontSize: '0.75rem',
+                color: '#cbd5e1',
+                textAlign: 'left',
+                paddingTop: '0.5rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+              }}>
+                <p style={{ margin: '0.5rem 0 0 0' }}>
+                  <strong>{editingVideo.title}</strong>
+                </p>
+                <p style={{ margin: '0.25rem 0', color: '#9ca3af' }}>
+                  {editingVideo.duration ? formatDuration(editingVideo.duration) : 'Duration N/A'}
+                </p>
+                <p style={{ margin: '0.25rem 0', color: '#9ca3af' }}>
+                  {editingVideo.width && editingVideo.height ? `${editingVideo.width}x${editingVideo.height}` : 'Resolution N/A'}
+                </p>
+                <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.7rem', color: '#0891b2', fontWeight: '600', cursor: 'pointer' }}>
+                  💾 Click below to replace video
+                </p>
+              </div>
+
+              {/* Hidden file input for replacement */}
+              <input
+                type="file"
+                onChange={handleFileInput}
+                accept="video/*"
+                style={{ display: 'none' }}
+                id="video-input-replace"
+              />
+              <label
+                htmlFor="video-input-replace"
+                style={{
+                  marginTop: '0.75rem',
+                  padding: '0.5rem 1rem',
+                  background: '#0891b2',
+                  color: '#ffffff',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#06b6d4';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#0891b2';
+                }}
+              >
+                Replace Video
+              </label>
             </div>
           )}
         </div>

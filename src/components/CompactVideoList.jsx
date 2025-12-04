@@ -209,9 +209,11 @@ export default function CompactVideoList({
                 <button
                   onClick={() => onToggleFeatured && onToggleFeatured(video.id, video.isFeatured)}
                   style={{
+                    minWidth: '32px',
                     width: '32px',
                     height: '32px',
-                    background: video.isFeatured ? 'rgba(251, 191, 36, 0.9)' : 'rgba(100, 116, 139, 0.5)',
+                    padding: '0',
+                    background: video.isFeatured ? '#fbbf24' : 'rgba(100, 116, 139, 0.5)',
                     border: 'none',
                     borderRadius: '6px',
                     display: 'flex',
@@ -219,25 +221,30 @@ export default function CompactVideoList({
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
+                    flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.boxShadow = '0 0 8px rgba(8, 145, 178, 0.5)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }}
                   title={video.isFeatured ? 'Remove from featured' : 'Add to featured'}
                 >
-                  <Star size={16} color={video.isFeatured ? '#000000' : '#ffffff'} fill={video.isFeatured ? '#000000' : 'none'} />
+                  <Star size={18} color={video.isFeatured ? '#000000' : '#ffffff'} fill={video.isFeatured ? '#fbbf24' : 'none'} strokeWidth={2} />
                 </button>
 
                 {/* Edit Button */}
                 <button
                   onClick={() => onEdit && onEdit(video)}
                   style={{
+                    minWidth: '32px',
                     width: '32px',
                     height: '32px',
-                    background: 'rgba(8, 145, 178, 0.6)',
+                    padding: '0',
+                    background: '#0891b2',
                     border: 'none',
                     borderRadius: '6px',
                     display: 'flex',
@@ -245,18 +252,21 @@ export default function CompactVideoList({
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
+                    flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.9)';
+                    e.currentTarget.style.background = '#06b6d4';
                     e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.boxShadow = '0 0 8px rgba(8, 145, 178, 0.8)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.6)';
+                    e.currentTarget.style.background = '#0891b2';
                     e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }}
                   title="Edit video"
                 >
-                  <Edit2 size={16} color="#ffffff" />
+                  <Edit2 size={18} color="#ffffff" strokeWidth={2} />
                 </button>
 
                 {/* Delete Button */}
@@ -267,9 +277,11 @@ export default function CompactVideoList({
                     }
                   }}
                   style={{
+                    minWidth: '32px',
                     width: '32px',
                     height: '32px',
-                    background: 'rgba(220, 38, 38, 0.6)',
+                    padding: '0',
+                    background: '#dc2626',
                     border: 'none',
                     borderRadius: '6px',
                     display: 'flex',
@@ -277,18 +289,21 @@ export default function CompactVideoList({
                     justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
+                    flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(220, 38, 38, 0.9)';
+                    e.currentTarget.style.background = '#b91c1c';
                     e.currentTarget.style.transform = 'scale(1.1)';
+                    e.currentTarget.style.boxShadow = '0 0 8px rgba(220, 38, 38, 0.8)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(220, 38, 38, 0.6)';
+                    e.currentTarget.style.background = '#dc2626';
                     e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = 'none';
                   }}
                   title="Delete video"
                 >
-                  <Trash2 size={16} color="#ffffff" />
+                  <Trash2 size={18} color="#ffffff" strokeWidth={2} />
                 </button>
               </td>
             </tr>
