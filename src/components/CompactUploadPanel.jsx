@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, X } from 'lucide-react';
 import { uploadVideoToCloudinary, validateVideoFile, formatFileSize, formatDuration } from '../utils/cloudinaryHelper';
 import { INDUSTRIES } from '../context/VideoContext';
@@ -21,7 +21,7 @@ export default function CompactUploadPanel({ onUploadSuccess, onEditModeChange, 
   });
 
   // Handle when editingVideo prop changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (editingVideo) {
       // Populate form with video data
       setFormData({
