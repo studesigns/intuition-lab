@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { VoiceContext } from '../context/VoiceContext';
 
-export default function LoginModal() {
+export default function LoginModal({ subtitle = 'Sign in to manage voices' }) {
   const { showLoginModal, setShowLoginModal, login } = useContext(VoiceContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +60,7 @@ export default function LoginModal() {
       >
         {/* Header */}
         <h2 className="text-2xl font-bold text-white mb-1">Admin Login</h2>
-        <p className="text-gray-400 text-sm mb-6">Sign in to manage voices</p>
+        <p className="text-gray-400 text-sm mb-6">{subtitle}</p>
 
         {error && (
           <div style={{

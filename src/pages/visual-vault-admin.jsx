@@ -97,7 +97,7 @@ export default function VisualVaultAdmin() {
       <TechNodes />
 
       {/* Login Modal */}
-      <LoginModal />
+      <LoginModal subtitle="Sign in to manage videos" />
 
       {/* Header */}
       <VideoHeader />
