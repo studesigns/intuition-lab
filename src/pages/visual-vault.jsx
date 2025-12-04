@@ -35,6 +35,17 @@ export default function VisualVault() {
     console.log('selectedVideo changed:', selectedVideo?.title || 'null');
   }, [selectedVideo]);
 
+  // Wrapper function for debugging
+  const handleVideoPlay = (video) => {
+    console.log('VisualVault.handleVideoPlay called with:', video?.title);
+    try {
+      setSelectedVideo(video);
+      console.log('setSelectedVideo called successfully');
+    } catch (err) {
+      console.error('Error in handleVideoPlay:', err);
+    }
+  };
+
   // Group videos by industry
   const videosByIndustry = INDUSTRIES.reduce((acc, industry) => {
     acc[industry] = videos.filter(v => v.industries?.includes(industry));
@@ -151,7 +162,7 @@ export default function VisualVault() {
                     minHeight: '500px',
                     boxShadow: '0 20px 60px rgba(8, 145, 178, 0.2)',
                   }}
-                  onClick={() => setSelectedVideo(featuredVideos[0])}
+                  onClick={() => handleVideoPlay(featuredVideos[0])}
                 >
                   {/* Background Image / Video */}
                   <img
@@ -271,7 +282,7 @@ export default function VisualVault() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedVideo(featuredVideos[0]);
+                          handleVideoPlay(featuredVideos[0]);
                         }}
                         style={{
                           display: 'inline-flex',
@@ -318,7 +329,7 @@ export default function VisualVault() {
                     <VideoRow
                       title={industry}
                       videos={industryVideos}
-                      onVideoPlay={(video) => setSelectedVideo(video)}
+                      onVideoPlay={handleVideoPlay}
                     />
                   </motion.div>
                 );
