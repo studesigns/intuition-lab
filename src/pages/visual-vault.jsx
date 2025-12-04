@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { VideoContext, INDUSTRIES } from '../context/VideoContext';
 import VideoHeader from '../components/VideoHeader';
@@ -29,6 +29,11 @@ const itemVariants = {
 export default function VisualVault() {
   const { videos, featuredVideos, loading } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
+
+  // Debug: log when selectedVideo changes
+  useEffect(() => {
+    console.log('selectedVideo changed:', selectedVideo?.title || 'null');
+  }, [selectedVideo]);
 
   // Group videos by industry
   const videosByIndustry = INDUSTRIES.reduce((acc, industry) => {

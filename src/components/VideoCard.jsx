@@ -29,6 +29,16 @@ export default function VideoCard({
     }
   }, [isHovered]);
 
+  const handleCardClick = () => {
+    console.log('VideoCard clicked:', video.title);
+    if (onPlay) {
+      console.log('Calling onPlay with video:', video);
+      onPlay(video);
+    } else {
+      console.log('onPlay handler not provided');
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.05, y: -10 }}
@@ -60,7 +70,7 @@ export default function VideoCard({
           ? '0 0 40px rgba(8, 145, 178, 0.7), 0 0 60px rgba(8, 145, 178, 0.3)'
           : 'none',
       }}
-      onClick={() => onPlay && onPlay(video)}
+      onClick={handleCardClick}
     >
       {/* Video Container */}
       <div style={{
