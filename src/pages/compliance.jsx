@@ -314,63 +314,75 @@ export default function Compliance() {
 
       <TechNodes />
 
-      {/* Back to Dashboard Button */}
-      <motion.button
-        onClick={() => navigate('/')}
-        style={{
-          position: 'fixed',
-          top: '12px',
-          left: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.5rem 1.25rem',
-          background: 'rgba(30, 41, 59, 0.8)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '8px',
-          color: '#cbd5e1',
-          fontSize: '0.8rem',
-          fontWeight: '500',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          zIndex: 100,
-          pointerEvents: 'auto',
-        }}
-        whileHover={{
-          background: 'rgba(30, 41, 59, 0.95)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
-          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.8)';
-          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-        }}
-      >
-        <ArrowLeft size={16} />
-        Dashboard
-      </motion.button>
-
-      {/* Main Container */}
-      <div className="compliance-container" style={{
+      {/* Main Container with Header */}
+      <div style={{
         display: 'flex',
-        flexDirection: isMobile ? 'column' : 'row',
-        height: 'calc(100vh - 60px)',
-        marginTop: '60px',
+        flexDirection: 'column',
+        height: '100vh',
         maxWidth: '100%',
         overflow: 'hidden',
-        pointerEvents: 'none'
       }}>
+        {/* Header with Back Button */}
+        <div style={{
+          padding: '0.75rem 1.5rem',
+          background: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: '50px',
+          zIndex: 50,
+        }}>
+          <motion.button
+            onClick={() => navigate('/')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1.25rem',
+              background: 'rgba(30, 41, 59, 0.8)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '8px',
+              color: '#cbd5e1',
+              fontSize: '0.8rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              pointerEvents: 'auto',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(30, 41, 59, 0.8)';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            }}
+          >
+            <ArrowLeft size={16} />
+            Dashboard
+          </motion.button>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="compliance-container" style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          flex: 1,
+          maxWidth: '100%',
+          overflow: 'hidden',
+          pointerEvents: 'auto',
+          position: 'relative',
+        }}>
 
         {/* Left Panel: Document Vault - Collapsible */}
         <motion.div
           className="compliance-panel"
-          initial={{ opacity: 0, x: -20, width: isMobile ? '100%' : '20%' }}
-          animate={{ opacity: 1, x: 0, width: isPanelCollapsed && !isMobile ? '60px' : isMobile ? '100%' : '20%' }}
+          initial={{ opacity: 0, x: -20, width: isMobile ? '100%' : '18%' }}
+          animate={{ opacity: 1, x: 0, width: isPanelCollapsed && !isMobile ? '60px' : isMobile ? '100%' : '18%' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           style={{
             display: 'flex',
@@ -383,7 +395,7 @@ export default function Compliance() {
             zIndex: 10,
             position: 'relative',
             pointerEvents: 'auto',
-            marginRight: '0.75rem',
+            marginRight: '0.5rem',
           }}
         >
           {/* Header with Collapse Button */}
@@ -895,6 +907,7 @@ export default function Compliance() {
             </motion.button>
           </div>
         </motion.div>
+        </div>
       </div>
     </>
   );
