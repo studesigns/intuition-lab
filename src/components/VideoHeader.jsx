@@ -42,14 +42,9 @@ export default function VideoHeader() {
     setIsDropdownOpen(false);
   };
 
-  const handleAdminClick = () => {
-    if (isAdmin) {
-      logout();
-      setIsDropdownOpen(false);
-    } else {
-      setShowLoginModal(true);
-      setIsDropdownOpen(false);
-    }
+  const handleSignOut = () => {
+    logout();
+    setIsDropdownOpen(false);
   };
 
   return (
@@ -181,163 +176,198 @@ export default function VideoHeader() {
           ))}
         </nav>
 
-        {/* Right: User Avatar Dropdown */}
-        <div
-          ref={dropdownRef}
-          style={{
-            position: 'relative',
-            flexShrink: 0,
-          }}
-        >
-          {/* Avatar Button */}
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        {/* Right: Conditional Auth UI */}
+        {isAdmin ? (
+          // Admin: User Avatar with Dropdown Menu
+          <div
+            ref={dropdownRef}
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: '2px solid rgba(255, 255, 255, 0.2)',
-              background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+              position: 'relative',
+              flexShrink: 0,
+            }}
+          >
+            {/* Avatar Button */}
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(8, 145, 178, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <User size={20} color="white" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '0.75rem',
+                  background: '#1a1a1a',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+                  minWidth: '180px',
+                  zIndex: 1000,
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Admin Panel */}
+                <button
+                  onClick={() => {
+                    navigate('/visual-vault/admin');
+                    setIsDropdownOpen(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'none',
+                    border: 'none',
+                    color: '#b0b9c3',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.1)';
+                    e.currentTarget.style.color = '#22d3ee';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = '#b0b9c3';
+                  }}
+                >
+                  <Settings size={16} />
+                  <span>Admin Panel</span>
+                </button>
+
+                {/* Dashboard */}
+                <button
+                  onClick={() => {
+                    navigate('/');
+                    setIsDropdownOpen(false);
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'none',
+                    border: 'none',
+                    color: '#b0b9c3',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.1)';
+                    e.currentTarget.style.color = '#22d3ee';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = '#b0b9c3';
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  <span>Dashboard</span>
+                </button>
+
+                {/* Sign Out */}
+                <button
+                  onClick={handleSignOut}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: 'none',
+                    border: 'none',
+                    color: '#b0b9c3',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.color = '#ef4444';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none';
+                    e.currentTarget.style.color = '#b0b9c3';
+                  }}
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          // Guest: Simple "Sign In" Button
+          <button
+            onClick={() => setShowLoginModal(true)}
+            style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.5rem 1rem',
+              background: 'rgba(8, 145, 178, 0.2)',
+              border: '1px solid rgba(8, 145, 178, 0.4)',
+              borderRadius: '6px',
+              color: '#22d3ee',
+              fontSize: '0.875rem',
+              fontWeight: '600',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-              e.currentTarget.style.boxShadow = '0 0 15px rgba(8, 145, 178, 0.4)';
+              e.currentTarget.style.background = 'rgba(8, 145, 178, 0.3)';
+              e.currentTarget.style.borderColor = 'rgba(8, 145, 178, 0.6)';
+              e.currentTarget.style.boxShadow = '0 0 12px rgba(8, 145, 178, 0.3)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.background = 'rgba(8, 145, 178, 0.2)';
+              e.currentTarget.style.borderColor = 'rgba(8, 145, 178, 0.4)';
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <User size={20} color="white" />
+            <User size={16} />
+            <span>Sign In</span>
           </button>
-
-          {/* Dropdown Menu */}
-          {isDropdownOpen && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '0.75rem',
-                background: '#1a1a1a',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '8px',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-                minWidth: '180px',
-                zIndex: 1000,
-                overflow: 'hidden',
-              }}
-            >
-              {/* Admin Panel */}
-              <button
-                onClick={() => {
-                  navigate('/visual-vault/admin');
-                  setIsDropdownOpen(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#b0b9c3',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(8, 145, 178, 0.1)';
-                  e.currentTarget.style.color = '#22d3ee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'none';
-                  e.currentTarget.style.color = '#b0b9c3';
-                }}
-              >
-                <Settings size={16} />
-                <span>Admin Panel</span>
-              </button>
-
-              {/* Dashboard */}
-              <button
-                onClick={() => {
-                  navigate('/');
-                  setIsDropdownOpen(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#b0b9c3',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(8, 145, 178, 0.1)';
-                  e.currentTarget.style.color = '#22d3ee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'none';
-                  e.currentTarget.style.color = '#b0b9c3';
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-                <span>Dashboard</span>
-              </button>
-
-              {/* Sign Out */}
-              <button
-                onClick={handleAdminClick}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  background: 'none',
-                  border: 'none',
-                  color: '#b0b9c3',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
-                  e.currentTarget.style.color = '#ef4444';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'none';
-                  e.currentTarget.style.color = '#b0b9c3';
-                }}
-              >
-                <LogOut size={16} />
-                <span>{isAdmin ? 'Sign Out' : 'Sign In'}</span>
-              </button>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </header>
   );
