@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader } from 'lucide-react';
+import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader, Trash2 } from 'lucide-react';
 import TechNodes from '../components/TechNodes';
 import ComplianceConfidenceScorecard from '../components/ComplianceConfidenceScorecard';
 import { parseComplianceResponse, formatComplianceAction } from '../utils/complianceParser';
@@ -162,6 +162,62 @@ export default function Compliance() {
     };
 
     setConversation(prev => [...prev, confirmationMsg]);
+  };
+
+  const handleDeleteDocument = async (policy) => {
+    // Confirmation dialog
+    if (!window.confirm(`Are you sure you want to remove "${policy.name}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setError(null);
+
+      // Optimistic UI update - remove immediately
+      setPolicies(prev => prev.filter(p => p.id !== policy.id));
+
+      // Call backend to delete from vector store
+      const response = await fetch(`${API_URL}/documents/${encodeURIComponent(policy.name)}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Delete failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Document deleted:', data);
+
+      // Show success message
+      setConversation(prev => [...prev, {
+        id: prev.length + 1,
+        type: 'system',
+        message: `Document "${policy.name}" deleted successfully (${data.chunks_deleted} chunks removed)`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }]);
+
+    } catch (err) {
+      console.error('Delete error:', err);
+      setError(`Failed to delete document: ${err.message}`);
+
+      // Revert UI on error (re-fetch policies)
+      try {
+        const response = await fetch(`${API_URL}/documents`);
+        if (response.ok) {
+          const data = await response.json();
+          const policiesList = data.files.map((file, idx) => ({
+            id: idx,
+            name: file.filename,
+            size: '-- KB',
+            uploadedDate: new Date(file.upload_timestamp).toLocaleDateString()
+          }));
+          setPolicies(policiesList);
+        }
+      } catch (e) {
+        console.error('Failed to recover policies list:', e);
+      }
+    }
   };
 
   const handleDrag = (e) => {
@@ -423,28 +479,66 @@ export default function Compliance() {
                     display: 'flex',
                     alignItems: 'flex-start',
                     gap: '0.75rem',
+                    justifyContent: 'space-between',
                   }}>
-                    <FileText size={18} style={{ color: '#0891b2', marginTop: '0.25rem', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontSize: '0.875rem',
-                        color: '#e2e8f0',
-                        margin: '0 0 0.25rem 0',
-                        fontWeight: '500',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}>
-                        {policy.name}
-                      </p>
-                      <p style={{
-                        fontSize: '0.75rem',
-                        color: '#64748b',
-                        margin: 0,
-                      }}>
-                        {policy.size} • {policy.uploadedDate}
-                      </p>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      flex: 1,
+                      minWidth: 0,
+                    }}>
+                      <FileText size={18} style={{ color: '#0891b2', marginTop: '0.25rem', flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          fontSize: '0.875rem',
+                          color: '#e2e8f0',
+                          margin: '0 0 0.25rem 0',
+                          fontWeight: '500',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}>
+                          {policy.name}
+                        </p>
+                        <p style={{
+                          fontSize: '0.75rem',
+                          color: '#64748b',
+                          margin: 0,
+                        }}>
+                          {policy.size} • {policy.uploadedDate}
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Delete Button */}
+                    <motion.button
+                      onClick={() => handleDeleteDocument(policy)}
+                      style={{
+                        padding: '0.5rem',
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#94a3b8',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#ef4444';
+                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                        e.currentTarget.style.borderRadius = '4px';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#94a3b8';
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                      title="Delete this document"
+                    >
+                      <Trash2 size={16} />
+                    </motion.button>
                   </div>
                 </motion.div>
               ))}
