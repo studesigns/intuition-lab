@@ -1,8 +1,8 @@
 /* Compliance Engine Styling - Dashboard-inspired with Aurora Orbs */
 
-/* Override aurora-container z-index to bring orbs forward */
+/* Override aurora-container z-index to bring orbs ABOVE all content */
 .aurora-container {
-  z-index: 1 !important;
+  z-index: 100 !important;
 }
 
 .compliance-container {
