@@ -2,15 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { VoiceProvider, VoiceContext, CATEGORIES, SOURCES } from '../context/VoiceContext';
+import { VoiceProvider, VoiceContext, CATEGORIES } from '../context/VoiceContext';
 import VoiceCard from '../components/VoiceCard';
 import VoiceModal from '../components/VoiceModal';
 import LoginModal from '../components/LoginModal';
 import Header from '../components/Header';
-import TechNodes from '../components/TechNodes';
 import '../styles/AuroraBackground.css';
 
-// Animation variants for smooth entrance effects
+// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,51 +21,24 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-  },
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.6,
-      ease: 'easeOut',
-    },
+    transition: { duration: 0.6, ease: 'easeOut' },
   },
 };
 
-const headerVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: 'easeOut' },
-  },
-};
-
-const buttonVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, ease: 'easeOut' },
-  },
-};
-
-// Main Library Component - Adapted from original Library (lines 620-669)
+// Main Library Component
 function Library() {
   const { voices, loading, isAdmin } = useContext(VoiceContext);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [activeSource, setActiveSource] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [playingVoiceId, setPlayingVoiceId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingVoice, setEditingVoice] = useState(null);
   const audioRef = useRef(new Audio());
 
-  // Handle play/pause toggle - EXACT logic from original (lines 629-638)
+  // Handle play/pause toggle
   const handleTogglePlay = (voice) => {
     const audio = audioRef.current;
     if (playingVoiceId === voice.id) {
@@ -86,7 +58,7 @@ function Library() {
     }
   };
 
-  // Handle audio end - EXACT logic from original (line 639)
+  // Handle audio end
   useEffect(() => {
     const audio = audioRef.current;
     const handleEnded = () => setPlayingVoiceId(null);
@@ -97,23 +69,30 @@ function Library() {
     };
   }, []);
 
-  // Handle edit voice - Lift state up to open modal at page level
+  // Handle edit voice
   const handleEditVoice = (voice) => {
     setEditingVoice(voice);
     setShowAddModal(true);
   };
 
-  // Filter voices - EXACT logic from original (lines 641-649)
-  const filteredVoices = voices.filter(voice => {
-    const matchesCategory = activeCategory === 'All' || voice.category === activeCategory;
-    const matchesSource = activeSource === 'all' || voice.source === activeSource;
-    const matchesSearch =
-      voice.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      voice.language?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      voice.accent?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      voice.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSource && matchesSearch;
-  });
+  // Group voices by category (tag)
+  const voicesByCategory = () => {
+    const grouped = {};
+    voices.forEach(voice => {
+      const category = voice.category || 'Other';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(voice);
+    });
+    return grouped;
+  };
+
+  const voiceGroups = voicesByCategory();
+  const categories = Object.keys(voiceGroups);
+
+  // Get featured voice (first one or random)
+  const featuredVoice = voices.length > 0 ? voices[0] : null;
 
   return (
     <div style={{
@@ -123,273 +102,306 @@ function Library() {
       zIndex: 10,
       background: 'transparent !important',
     }}>
-      {/* Header - Original line 653 */}
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {/* Header */}
+      <Header />
 
-      {/* Login Modal - Original line 654 */}
+      {/* Login Modal */}
       <LoginModal />
 
       {/* Main Content */}
-      <main style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '2rem 1.5rem',
-        paddingTop: '2rem',
+      <div style={{
+        position: 'relative',
+        zIndex: 10,
+        paddingTop: '80px',
       }}>
-        {/* Category Buttons + Add Voice Button - Original lines 656-658 */}
-        <motion.div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            marginBottom: '3rem',
-          }}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-        >
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '0.5rem',
-          }}>
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.875rem',
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease',
-                  background: activeCategory === cat ? '#3f464f' : 'transparent',
-                  color: activeCategory === cat ? '#ffffff' : '#9ca3af',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  cursor: 'pointer',
-                  boxShadow: 'none',
-                }}
-                onMouseEnter={(e) => {
-                  if (activeCategory !== cat) {
-                    e.currentTarget.style.background = '#4b5563';
-                    e.currentTarget.style.color = '#cbd5e1';
-                    e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.25)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeCategory !== cat) {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#9ca3af';
-                    e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.15)';
-                  }
-                }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Add Voice Button - Original line 658 */}
-          {isAdmin && (
-            <button
-              onClick={() => setShowAddModal(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.625rem 1.25rem',
-                background: '#0891b2',
-                color: '#ffffff',
-                borderRadius: '9999px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 0 15px rgba(8, 145, 178, 0.3)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#0e7490';
-                e.currentTarget.style.boxShadow = '0 0 25px rgba(8, 145, 178, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0891b2';
-                e.currentTarget.style.boxShadow = '0 0 15px rgba(8, 145, 178, 0.3)';
-              }}
-            >
-              <Plus size={18} />
-              Add Voice
-            </button>
-          )}
-        </motion.div>
-
-        {/* Sources Filter Row */}
-        <motion.div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-            marginBottom: '2rem',
-          }}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.3 }}
-        >
-          <button
-            onClick={() => setActiveSource('all')}
+        {/* Hero Section - Featured Voice */}
+        {featuredVoice && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
             style={{
-              padding: '0.5rem 1rem',
-              borderRadius: '9999px',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              transition: 'all 0.2s ease',
-              background: activeSource === 'all' ? '#3f464f' : 'transparent',
-              color: activeSource === 'all' ? '#ffffff' : '#9ca3af',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => {
-              if (activeSource !== 'all') {
-                e.currentTarget.style.background = '#4b5563';
-                e.currentTarget.style.color = '#cbd5e1';
-                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.25)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (activeSource !== 'all') {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#9ca3af';
-                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.15)';
-              }
+              position: 'relative',
+              width: '100%',
+              minHeight: '50vh',
+              overflow: 'hidden',
+              marginBottom: '4rem',
             }}
           >
-            All Sources
-          </button>
-          {SOURCES.map(source => (
-            <button
-              key={source.id}
-              onClick={() => setActiveSource(source.id)}
+            {/* Hero Background - Sound Wave Gradient */}
+            <div
               style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                transition: 'all 0.2s ease',
-                background: activeSource === source.id ? '#3f464f' : 'transparent',
-                color: activeSource === source.id ? '#ffffff' : '#9ca3af',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                cursor: 'pointer',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.3) 0%, rgba(14, 116, 144, 0.2) 50%, rgba(6, 78, 87, 0.1) 100%)',
+                zIndex: 0,
               }}
-              onMouseEnter={(e) => {
-                if (activeSource !== source.id) {
-                  e.currentTarget.style.background = '#4b5563';
-                  e.currentTarget.style.color = '#cbd5e1';
-                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.25)';
-                }
+            />
+
+            {/* Sound Wave Animation Background */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '300px',
+                height: '300px',
+                background: 'radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, transparent 70%)',
+                borderRadius: '50%',
+                zIndex: 1,
               }}
-              onMouseLeave={(e) => {
-                if (activeSource !== source.id) {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#9ca3af';
-                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.15)';
-                }
+            />
+
+            {/* Microphone Icon Area */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                fontSize: '120px',
+                zIndex: 2,
+                opacity: 0.3,
               }}
             >
-              {source.name}
-            </button>
-          ))}
-        </motion.div>
+              🎙️
+            </div>
 
-        {/* Loading State - Original line 661 */}
-        {loading && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: '5rem',
-            paddingBottom: '5rem',
-          }}>
-            <span style={{ fontSize: '2rem', animation: 'spin 1s linear infinite' }}>⏳</span>
-          </div>
-        )}
-
-        {/* Voice Grid - Original line 662 */}
-        {!loading && filteredVoices.length > 0 && (
-          <AnimatePresence>
-            <motion.div
+            {/* Dark Overlay Gradient */}
+            <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '2rem',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%), linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)',
+                zIndex: 2,
               }}
-              initial="hidden"
-              animate="visible"
-              variants={containerVariants}
+            />
+
+            {/* Hero Content */}
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 3,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                padding: '4rem 3rem',
+                maxWidth: '900px',
+              }}
             >
-              {filteredVoices.map(voice => (
-                <motion.div
-                  key={voice.id}
-                  variants={cardVariants}
+              {/* Featured Label */}
+              <span
+                style={{
+                  display: 'inline-block',
+                  background: 'rgba(8, 145, 178, 0.9)',
+                  color: '#ffffff',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '9999px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  marginBottom: '1.5rem',
+                  width: 'fit-content',
+                }}
+              >
+                Featured Voice of the Month
+              </span>
+
+              {/* Voice Name */}
+              <h1
+                style={{
+                  fontSize: '3.5rem',
+                  fontWeight: 'bold',
+                  color: '#ffffff',
+                  margin: '0 0 0.5rem 0',
+                  letterSpacing: '-1px',
+                }}
+              >
+                {featuredVoice.name}
+              </h1>
+
+              {/* Category + Details */}
+              <p
+                style={{
+                  fontSize: '1.5rem',
+                  color: '#22d3ee',
+                  margin: '0 0 1.5rem 0',
+                  fontWeight: '500',
+                }}
+              >
+                {featuredVoice.category} • {featuredVoice.accent} • {featuredVoice.language}
+              </p>
+
+              {/* Description */}
+              {featuredVoice.description && (
+                <p
+                  style={{
+                    fontSize: '1.125rem',
+                    color: '#cbd5e1',
+                    margin: '0 0 2rem 0',
+                    lineHeight: '1.6',
+                    maxWidth: '600px',
+                  }}
                 >
-                  <VoiceCard
-                    voice={voice}
-                    isPlaying={playingVoiceId === voice.id}
-                    onTogglePlay={handleTogglePlay}
-                    onEdit={handleEditVoice}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+                  {featuredVoice.description}
+                </p>
+              )}
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'center',
+              }}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleTogglePlay(featuredVoice)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '1rem 2.5rem',
+                    background: '#ffffff',
+                    color: '#000000',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  🎵 Listen to Demo
+                </motion.button>
+              </div>
+            </div>
+
+            {/* Fade to Black at Bottom */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: '200px',
+                background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9))',
+                zIndex: 1,
+                pointerEvents: 'none',
+              }}
+            />
+          </motion.div>
         )}
 
-        {/* Empty State - Original line 663 */}
-        {!loading && filteredVoices.length === 0 && (
-          <div style={{
-            textAlign: 'center',
-            paddingTop: '5rem',
-            paddingBottom: '5rem',
-          }}>
+        {/* Main Content Area */}
+        <div
+          style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            padding: '0 2rem 4rem 2rem',
+          }}
+        >
+          {/* Loading State */}
+          {loading && (
             <div style={{
-              width: '4rem',
-              height: '4rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '9999px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 1rem',
+              paddingTop: '5rem',
+              paddingBottom: '5rem',
             }}>
-              <span style={{ fontSize: '1.75rem' }}>🔊</span>
+              <span style={{ fontSize: '2rem', animation: 'spin 1s linear infinite' }}>⏳</span>
             </div>
-            <h3 style={{
-              fontSize: '1.125rem',
-              fontWeight: '600',
-              color: '#ffffff',
-              marginBottom: '0.5rem',
-            }}>
-              No voices found
-            </h3>
-            <p style={{
-              color: '#9ca3af',
-              fontSize: '0.875rem',
-            }}>
-              {voices.length === 0
-                ? 'Get started by adding your first voice sample.'
-                : 'Try adjusting your search or filters.'}
-            </p>
-          </div>
-        )}
+          )}
 
-        {/* Add/Edit Voice Modal - Original line 666 */}
+          {/* Voice Categories */}
+          {!loading && categories.length > 0 && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {categories.map(category => (
+                <motion.div key={category} variants={itemVariants} style={{ marginBottom: '3rem' }}>
+                  {/* Category Title */}
+                  <h2 style={{
+                    fontSize: '1.5rem',
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    marginBottom: '1rem',
+                    marginLeft: '0',
+                  }}>
+                    {category}
+                  </h2>
+
+                  {/* Voice Cards Grid */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                    gap: '1.5rem',
+                  }}>
+                    {voiceGroups[category].map(voice => (
+                      <VoiceCard
+                        key={voice.id}
+                        voice={voice}
+                        isPlaying={playingVoiceId === voice.id}
+                        onTogglePlay={handleTogglePlay}
+                        onEdit={handleEditVoice}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Empty State */}
+          {!loading && voices.length === 0 && (
+            <div style={{
+              textAlign: 'center',
+              paddingTop: '5rem',
+              paddingBottom: '5rem',
+            }}>
+              <div style={{
+                width: '4rem',
+                height: '4rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <span style={{ fontSize: '1.75rem' }}>🎤</span>
+              </div>
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#ffffff',
+                marginBottom: '0.5rem',
+              }}>
+                No voices yet
+              </h3>
+              <p style={{
+                color: '#9ca3af',
+                fontSize: '0.875rem',
+              }}>
+                Get started by adding your first voice sample.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Add/Edit Voice Modal */}
         {showAddModal && (
           <VoiceModal
             voice={editingVoice}
@@ -399,7 +411,7 @@ function Library() {
             }}
           />
         )}
-      </main>
+      </div>
 
       <style>{`
         @keyframes spin {
@@ -412,17 +424,21 @@ function Library() {
 
 // Main VoPlayer Component - The Page Component
 export default function VoPlayer() {
-  const navigate = useNavigate();
-
   return (
     <>
-      {/* Aurora Background */}
-      <div className="aurora-container">
-        <div className="aurora-orb-3"></div>
-      </div>
-
-      {/* Particle Effects */}
-      <TechNodes />
+      {/* Cinematic Gradient Background */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: -1,
+          background: 'radial-gradient(ellipse at center, #1f2937 0%, #0a0a0a 50%, #000000 100%)',
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* Main Content */}
       <div style={{ position: 'relative', zIndex: 10 }}>
