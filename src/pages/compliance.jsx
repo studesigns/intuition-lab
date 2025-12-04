@@ -325,10 +325,10 @@ export default function Compliance() {
         {/* Header with Back Button */}
         <div style={{
           padding: '0.75rem 1.5rem',
-          background: 'rgba(15, 23, 42, 0.6)',
+          background: 'rgba(15, 23, 42, 0.9)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           display: 'flex',
           alignItems: 'center',
           minHeight: '50px',
@@ -446,7 +446,7 @@ export default function Compliance() {
             )}
 
             {/* Collapse/Expand Button */}
-            <motion.button
+            <button
               onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
               style={{
                 padding: '0.5rem',
@@ -460,6 +460,8 @@ export default function Compliance() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginLeft: isPanelCollapsed && !isMobile ? 'auto' : '0.5rem',
+                pointerEvents: 'auto',
+                zIndex: 15,
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
@@ -472,7 +474,7 @@ export default function Compliance() {
               title={isPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
               {isPanelCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </motion.button>
+            </button>
           </div>
 
           {/* Error Banner */}
