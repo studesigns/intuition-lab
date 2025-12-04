@@ -65,62 +65,95 @@ export default function Header({ searchQuery, setSearchQuery }) {
           gap: '2rem',
         }}
       >
-        {/* Left: Branding */}
+        {/* Left: Branding + Home Button */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem',
+            gap: '2rem',
             flexShrink: 0,
           }}
         >
-          {/* Logo Icon */}
+          {/* Branding */}
           <div
             style={{
-              width: '2.25rem',
-              height: '2.25rem',
-              background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
-              borderRadius: '0.5rem',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-            }}
-            onClick={() => navigate('/vo-player')}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(8, 145, 178, 0.6)';
-              e.currentTarget.style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-              e.currentTarget.style.transform = 'scale(1)';
+              gap: '0.75rem',
             }}
           >
-            <Mic size={18} color="white" />
+            {/* Logo Icon */}
+            <div
+              style={{
+                width: '2.25rem',
+                height: '2.25rem',
+                background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
+                borderRadius: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+              onClick={() => navigate('/vo-player')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(8, 145, 178, 0.6)';
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              <Mic size={18} color="white" />
+            </div>
+
+            {/* Title - Minimalist */}
+            <h1
+              style={{
+                fontSize: '1.125rem',
+                fontWeight: '700',
+                color: '#ffffff',
+                margin: 0,
+                letterSpacing: '-0.5px',
+                cursor: 'pointer',
+                transition: 'color 0.3s ease',
+              }}
+              onClick={() => navigate('/vo-player')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#22d3ee';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = '#ffffff';
+              }}
+            >
+              Voice Vault
+            </h1>
           </div>
 
-          {/* Title - Minimalist */}
-          <h1
+          {/* Home Button */}
+          <button
+            onClick={() => navigate('/')}
             style={{
-              fontSize: '1.125rem',
-              fontWeight: '700',
-              color: '#ffffff',
-              margin: 0,
-              letterSpacing: '-0.5px',
+              background: 'none',
+              border: 'none',
+              color: '#b0b9c3',
+              fontSize: '0.9rem',
+              fontWeight: '500',
               cursor: 'pointer',
-              transition: 'color 0.3s ease',
+              transition: 'all 0.3s ease',
+              padding: '0.5rem 0',
+              borderBottom: 'none',
             }}
-            onClick={() => navigate('/vo-player')}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#22d3ee';
-            }}
-            onMouseLeave={(e) => {
               e.currentTarget.style.color = '#ffffff';
             }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#b0b9c3';
+            }}
           >
-            Voice Vault
-          </h1>
+            Home
+          </button>
         </div>
 
         {/* Center: Glassmorphic Search Bar */}
