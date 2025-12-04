@@ -346,29 +346,11 @@ export default function Compliance() {
       </motion.button>
 
       {/* Main Container */}
-      <div style={{
-        height: 'calc(100vh - 100px)',
-        display: 'flex',
-        gap: '0px',
-        padding: '0px',
-        maxWidth: '100%',
-        margin: '0 auto',
-        marginTop: '100px',
-      }}>
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] mt-[100px] max-w-full mx-auto overflow-hidden">
 
         {/* Left Panel: Document Vault (30%) */}
         <motion.div
-          style={{
-            width: '30%',
-            background: 'rgba(15, 23, 42, 0.6)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            zIndex: 20,
-          }}
+          className="hidden lg:flex flex-col w-full lg:w-[30%] border-r border-white/10 bg-slate-900/60 backdrop-blur-xl z-20"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -620,13 +602,7 @@ export default function Compliance() {
 
         {/* Right Panel: Intelligence Stream (70%) */}
         <motion.div
-          style={{
-            width: '70%',
-            background: 'transparent',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
+          className="flex flex-col w-full lg:w-[70%] bg-transparent overflow-hidden"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
