@@ -373,7 +373,8 @@ export default function Compliance() {
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             overflow: 'hidden',
-            zIndex: 20,
+            zIndex: 10,
+            position: 'relative',
           }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -631,7 +632,9 @@ export default function Compliance() {
             display: 'flex',
             flexDirection: 'column',
             background: 'transparent',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            zIndex: 10,
+            position: 'relative',
           }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
