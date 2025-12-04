@@ -281,7 +281,7 @@ export default function Compliance() {
 
       // Add uploaded files to policies list
       const newPolicies = pdfFiles.map((file, idx) => ({
-        id: policies.length + idx,
+        id: Date.now() + idx,
         name: file.name,
         size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
         uploadedDate: new Date().toLocaleDateString()
