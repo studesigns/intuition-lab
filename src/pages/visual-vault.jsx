@@ -451,7 +451,7 @@ export default function VisualVault() {
       )}
 
       {/* Login Modal */}
-      <LoginModal />
+      <LoginModal subtitle="Sign in to manage videos" />
     </>
   );
 }
