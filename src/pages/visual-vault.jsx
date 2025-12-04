@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { VideoContext, INDUSTRIES } from '../context/VideoContext';
 import VideoHeader from '../components/VideoHeader';
@@ -32,19 +32,22 @@ export default function VisualVault() {
 
   // Debug: log when selectedVideo changes
   useEffect(() => {
-    console.log('selectedVideo changed:', selectedVideo?.title || 'null');
+    console.log('[EFFECT] selectedVideo changed:', selectedVideo?.title || 'null');
+    if (selectedVideo) {
+      console.log('[EFFECT] selectedVideo is NOT null, should render modal');
+      console.log('[EFFECT] selectedVideo object:', selectedVideo);
+    } else {
+      console.log('[EFFECT] selectedVideo is null, modal should be hidden');
+    }
   }, [selectedVideo]);
 
-  // Wrapper function for debugging
-  const handleVideoPlay = (video) => {
-    console.log('VisualVault.handleVideoPlay called with:', video?.title);
-    try {
-      setSelectedVideo(video);
-      console.log('setSelectedVideo called successfully');
-    } catch (err) {
-      console.error('Error in handleVideoPlay:', err);
-    }
-  };
+  // Wrapper function for debugging with useCallback
+  const handleVideoPlay = useCallback((video) => {
+    console.log('[handleVideoPlay] Called with:', video?.title);
+    console.log('[handleVideoPlay] About to call setSelectedVideo');
+    setSelectedVideo(video);
+    console.log('[handleVideoPlay] setSelectedVideo called');
+  }, []);
 
   // Group videos by industry
   const videosByIndustry = INDUSTRIES.reduce((acc, industry) => {
@@ -343,7 +346,10 @@ export default function VisualVault() {
       {selectedVideo && (
         <VideoModal
           video={selectedVideo}
-          onClose={() => setSelectedVideo(null)}
+          onClose={() => {
+            console.log('[CLOSE] Modal close button clicked');
+            setSelectedVideo(null);
+          }}
         />
       )}
     </>
