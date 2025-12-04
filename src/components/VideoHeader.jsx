@@ -145,7 +145,7 @@ export default function VideoHeader() {
             </button>
           ) : (
             <button
-              onClick={() => setShowLoginModal(true)}
+              onClick={() => navigate('/visual-vault/admin')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
