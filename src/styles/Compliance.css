@@ -1,5 +1,11 @@
 /* Compliance Engine Styling - Dashboard-inspired with Aurora Orbs */
 
+/* Ensure aurora orbs are visible on compliance page by layering properly */
+/* Aurora container sits at z-index: 1 (above base -10, below panels at 10) */
+.aurora-container {
+  z-index: 1 !important;
+}
+
 .compliance-container {
   min-height: 100vh;
   display: flex;

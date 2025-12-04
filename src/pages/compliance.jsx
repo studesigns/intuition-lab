@@ -372,7 +372,7 @@ export default function Compliance() {
             width: isMobile ? '100%' : '30%',
             display: 'flex',
             flexDirection: 'column',
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: 'transparent',
             borderRight: '1px solid rgba(255,255,255,0.1)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
