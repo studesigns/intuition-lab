@@ -1,11 +1,11 @@
 import { useState, useContext, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { VideoContext } from '../context/VideoContext';
 import { VoiceContext } from '../context/VoiceContext';
 import VideoHeader from '../components/VideoHeader';
-import VideoUploadZone from '../components/VideoUploadZone';
-import VideoCard from '../components/VideoCard';
+import CompactUploadPanel from '../components/CompactUploadPanel';
+import CompactVideoList from '../components/CompactVideoList';
 import VideoModal from '../components/VideoModal';
 import LoginModal from '../components/LoginModal';
 import TechNodes from '../components/TechNodes';
@@ -194,26 +194,37 @@ export default function VisualVaultAdmin() {
         )}
 
         {/* Upload Section */}
-        <motion.section variants={itemVariants} style={{ marginBottom: '4rem' }}>
-          <VideoUploadZone onUploadSuccess={handleUploadSuccess} />
-        </motion.section>
+        <div style={{ marginBottom: '2rem' }}>
+          <CompactUploadPanel onUploadSuccess={handleUploadSuccess} />
+        </div>
 
-        {/* Manage Videos Section */}
-        <motion.section variants={itemVariants}>
-          <h2 style={{
-            fontSize: '1.75rem',
-            fontWeight: '600',
-            color: '#ffffff',
-            marginBottom: '2rem',
-            margin: '0 0 2rem 0',
+        {/* Library Section */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.4)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '16px',
+          overflow: 'hidden',
+        }}>
+          <div style={{
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '1.5rem',
+            background: 'rgba(30, 41, 59, 0.6)',
           }}>
-            Manage Videos
-          </h2>
+            <h2 style={{
+              fontSize: '1.25rem',
+              fontWeight: '600',
+              color: '#ffffff',
+              margin: 0,
+            }}>
+              Library ({videos.length})
+            </h2>
+          </div>
 
           {loading && (
             <div style={{
               textAlign: 'center',
-              padding: '4rem 2rem',
+              padding: '2rem',
             }}>
               <div style={{
                 display: 'inline-block',
@@ -226,7 +237,7 @@ export default function VisualVaultAdmin() {
               }} />
               <p style={{
                 color: '#9ca3af',
-                marginTop: '1rem',
+                marginTop: '0.75rem',
                 fontSize: '0.875rem',
               }}>Loading videos...</p>
 
@@ -238,54 +249,15 @@ export default function VisualVaultAdmin() {
             </div>
           )}
 
-          {!loading && videos.length === 0 && (
-            <div style={{
-              textAlign: 'center',
-              padding: '4rem 2rem',
-              background: 'rgba(30, 41, 59, 0.4)',
-              backdropFilter: 'blur(12px)',
-              borderRadius: '16px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}>
-              <p style={{
-                fontSize: '1rem',
-                color: '#9ca3af',
-                margin: 0,
-              }}>
-                No videos uploaded yet. Upload your first video above!
-              </p>
-            </div>
+          {!loading && (
+            <CompactVideoList
+              videos={videos}
+              onDelete={handleDelete}
+              onToggleFeatured={handleToggleFeatured}
+              onPreview={(video) => setSelectedVideo(video)}
+            />
           )}
-
-          {!loading && videos.length > 0 && (
-            <motion.div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: '2rem',
-              }}
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {videos.map(video => (
-                <motion.div key={video.id} variants={itemVariants}>
-                  <VideoCard
-                    video={video}
-                    onPlay={(v) => setSelectedVideo(v)}
-                    onEdit={(v) => {
-                      // Edit functionality can be expanded in Phase 2
-                      console.log('Edit video:', v);
-                    }}
-                    onDelete={handleDelete}
-                    onToggleFeatured={handleToggleFeatured}
-                    showAdminControls={true}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </motion.section>
+        </div>
       </motion.div>
 
       {/* Video Preview Modal */}
