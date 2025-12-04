@@ -1,10 +1,5 @@
 /* Compliance Engine Styling - Dashboard-inspired with Aurora Orbs */
 
-/* Ensure aurora-container is visible behind panels but on top of base background */
-.aurora-container {
-  z-index: 5 !important;
-}
-
 .compliance-container {
   min-height: 100vh;
   display: flex;
