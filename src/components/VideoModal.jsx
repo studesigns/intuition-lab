@@ -29,13 +29,14 @@ export default function VideoModal({ video, onClose }) {
       <div
         style={{
           backgroundColor: '#0f172a',
-          border: '1px solid #334155',
+          border: '1px solid rgba(8, 145, 178, 0.4)',
           borderRadius: '16px',
           padding: '2rem',
           maxWidth: '1200px',
           width: '100%',
           maxHeight: '90vh',
           overflowY: 'auto',
+          boxShadow: '0 0 40px rgba(8, 145, 178, 0.3), 0 0 60px rgba(8, 145, 178, 0.1)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -77,6 +78,8 @@ export default function VideoModal({ video, onClose }) {
           borderRadius: '12px',
           overflow: 'hidden',
           marginBottom: '2rem',
+          border: '1px solid rgba(8, 145, 178, 0.3)',
+          boxShadow: '0 8px 32px rgba(8, 145, 178, 0.2)',
         }}>
           <video
             ref={videoRef}
@@ -187,12 +190,13 @@ export default function VideoModal({ video, onClose }) {
 
           {/* Right: Video Details */}
           <div style={{
-            background: 'rgba(30, 41, 59, 0.4)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(30, 41, 59, 0.6)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(8, 145, 178, 0.3)',
             borderRadius: '12px',
             padding: '1.5rem',
+            boxShadow: '0 4px 20px rgba(8, 145, 178, 0.1)',
           }}>
             <h3 style={{
               fontSize: '0.875rem',

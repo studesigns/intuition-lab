@@ -130,119 +130,175 @@ export default function VisualVault() {
             {/* Hero Section - Featured Videos */}
             {featuredVideos.length > 0 && (
               <motion.section variants={itemVariants} style={{ marginBottom: '4rem' }}>
-                <h1 style={{
-                  fontSize: '3rem',
-                  fontWeight: 'bold',
-                  color: '#ffffff',
-                  marginBottom: '2rem',
-                  letterSpacing: '-1px',
-                }}>
-                  Featured Work
-                </h1>
-
-                {/* Hero Video Player */}
+                {/* Hero Container with Overlay */}
                 <motion.div
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.01 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                   style={{
                     width: '100%',
                     maxWidth: '100%',
                     background: '#000000',
-                    borderRadius: '16px',
+                    borderRadius: '20px',
                     overflow: 'hidden',
-                    border: '1px solid rgba(8, 145, 178, 0.2)',
+                    border: '1px solid rgba(8, 145, 178, 0.3)',
                     cursor: 'pointer',
+                    position: 'relative',
+                    minHeight: '500px',
+                    boxShadow: '0 20px 60px rgba(8, 145, 178, 0.2)',
                   }}
                   onClick={() => setSelectedVideo(featuredVideos[0])}
                 >
-                  <video
-                    src={featuredVideos[0].cloudinaryUrl}
-                    poster={featuredVideos[0].thumbnailUrl}
-                    controls
+                  {/* Background Image / Video */}
+                  <img
+                    src={featuredVideos[0].thumbnailUrl}
+                    alt={featuredVideos[0].title}
                     style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
                       width: '100%',
-                      height: 'auto',
-                      display: 'block',
-                      maxHeight: '600px',
+                      height: '100%',
+                      objectFit: 'cover',
+                      zIndex: 1,
                     }}
                   />
-                </motion.div>
 
-                {/* Featured Video Info */}
-                <div style={{
-                  marginTop: '1.5rem',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '2rem',
-                }}>
-                  <div>
-                    <h2 style={{
-                      fontSize: '1.75rem',
-                      fontWeight: '700',
-                      color: '#ffffff',
-                      margin: '0 0 0.5rem 0',
-                    }}>
-                      {featuredVideos[0].title}
-                    </h2>
-                    <p style={{
-                      fontSize: '1.125rem',
-                      color: '#22d3ee',
-                      margin: '0 0 1rem 0',
-                      fontWeight: '500',
-                    }}>
-                      {featuredVideos[0].clientName}
-                    </p>
-                    {featuredVideos[0].description && (
-                      <p style={{
-                        fontSize: '0.95rem',
-                        color: '#cbd5e1',
-                        margin: 0,
-                        lineHeight: '1.6',
-                      }}>
-                        {featuredVideos[0].description}
-                      </p>
-                    )}
-                  </div>
+                  {/* Dark Gradient Overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%)',
+                      zIndex: 2,
+                    }}
+                  />
 
-                  {/* Industries */}
-                  {featuredVideos[0].industries && featuredVideos[0].industries.length > 0 && (
+                  {/* Content Overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      width: '100%',
+                      padding: '3rem',
+                      background: 'linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)',
+                      zIndex: 3,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-end',
+                      minHeight: '250px',
+                    }}
+                  >
                     <div>
-                      <h3 style={{
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
-                        color: '#cbd5e1',
-                        margin: '0 0 1rem 0',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                      }}>
-                        Industries
-                      </h3>
-                      <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '0.75rem',
-                      }}>
-                        {featuredVideos[0].industries.map(industry => (
-                          <span
-                            key={industry}
-                            style={{
-                              display: 'inline-block',
-                              background: 'rgba(8, 145, 178, 0.2)',
-                              color: '#22d3ee',
-                              padding: '0.5rem 1rem',
-                              borderRadius: '9999px',
-                              fontSize: '0.875rem',
-                              fontWeight: '600',
-                              border: '1px solid rgba(8, 145, 178, 0.3)',
-                            }}
-                          >
-                            {industry}
-                          </span>
-                        ))}
-                      </div>
+                      {/* Industries */}
+                      {featuredVideos[0].industries && featuredVideos[0].industries.length > 0 && (
+                        <div style={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: '0.75rem',
+                          marginBottom: '1rem',
+                        }}>
+                          {featuredVideos[0].industries.map(industry => (
+                            <span
+                              key={industry}
+                              style={{
+                                display: 'inline-block',
+                                background: 'rgba(8, 145, 178, 0.9)',
+                                color: '#ffffff',
+                                padding: '0.35rem 0.75rem',
+                                borderRadius: '9999px',
+                                fontSize: '0.75rem',
+                                fontWeight: '700',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                              }}
+                            >
+                              {industry}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Title */}
+                      <h1
+                        style={{
+                          fontSize: '2.5rem',
+                          fontWeight: 'bold',
+                          color: '#ffffff',
+                          margin: '0 0 0.5rem 0',
+                          letterSpacing: '-1px',
+                        }}
+                      >
+                        {featuredVideos[0].title}
+                      </h1>
+
+                      {/* Client Name */}
+                      <p
+                        style={{
+                          fontSize: '1.25rem',
+                          color: '#22d3ee',
+                          margin: '0 0 1rem 0',
+                          fontWeight: '500',
+                        }}
+                      >
+                        {featuredVideos[0].clientName}
+                      </p>
+
+                      {/* Description */}
+                      {featuredVideos[0].description && (
+                        <p
+                          style={{
+                            fontSize: '1rem',
+                            color: '#cbd5e1',
+                            margin: '0 0 1.5rem 0',
+                            lineHeight: '1.6',
+                            maxWidth: '600px',
+                          }}
+                        >
+                          {featuredVideos[0].description}
+                        </p>
+                      )}
+
+                      {/* Watch Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedVideo(featuredVideos[0]);
+                        }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.875rem 2rem',
+                          background: '#0891b2',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 8px 20px rgba(8, 145, 178, 0.4)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#06b6d4';
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 12px 30px rgba(8, 145, 178, 0.6)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#0891b2';
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(8, 145, 178, 0.4)';
+                        }}
+                      >
+                        ▶ Watch Project
+                      </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                </motion.div>
               </motion.section>
             )}
 

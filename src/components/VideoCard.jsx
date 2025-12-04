@@ -51,12 +51,14 @@ export default function VideoCard({
         background: 'rgba(30, 41, 59, 0.4)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        border: isHovered ? '1px solid rgba(8, 145, 178, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '16px',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
-        boxShadow: isHovered ? '0 0 30px rgba(8, 145, 178, 0.4)' : 'none',
+        boxShadow: isHovered
+          ? '0 0 40px rgba(8, 145, 178, 0.7), 0 0 60px rgba(8, 145, 178, 0.3)'
+          : 'none',
       }}
       onClick={() => onPlay && onPlay(video)}
     >

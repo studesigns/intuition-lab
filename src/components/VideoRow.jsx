@@ -75,10 +75,10 @@ export default function VideoRow({
               zIndex: 10,
               width: '48px',
               height: '48px',
-              background: 'rgba(0, 0, 0, 0.7)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -88,15 +88,17 @@ export default function VideoRow({
               color: '#ffffff',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(8, 145, 178, 0.8)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(8, 145, 178, 0.5)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(8, 145, 178, 0.6)';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
               e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
             }}
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={24} strokeWidth={3} />
           </button>
         )}
 
@@ -161,10 +163,10 @@ export default function VideoRow({
               zIndex: 10,
               width: '48px',
               height: '48px',
-              background: 'rgba(0, 0, 0, 0.7)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -174,15 +176,17 @@ export default function VideoRow({
               color: '#ffffff',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(8, 145, 178, 0.8)';
-              e.currentTarget.style.boxShadow = '0 0 20px rgba(8, 145, 178, 0.5)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
+              e.currentTarget.style.boxShadow = '0 0 25px rgba(8, 145, 178, 0.6)';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
               e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
             }}
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={24} strokeWidth={3} />
           </button>
         )}
       </div>
