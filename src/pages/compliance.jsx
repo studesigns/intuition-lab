@@ -362,7 +362,8 @@ export default function Compliance() {
         marginTop: '100px',
         maxWidth: '100%',
         overflow: 'hidden',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        position: 'relative'
       }}>
 
         {/* Left Panel: Document Vault (30%) */}
