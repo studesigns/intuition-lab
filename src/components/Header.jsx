@@ -30,9 +30,11 @@ export default function Header({ searchQuery, setSearchQuery }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSignOut = () => {
-    logout();
+  const handleSignOut = async () => {
+    await logout();
     setIsDropdownOpen(false);
+    // Redirect to non-admin Voice Vault page
+    navigate('/vo-player');
   };
 
   return (

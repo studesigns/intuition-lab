@@ -43,9 +43,11 @@ export default function VideoHeader({ activeCategory = 'All', onCategoryChange =
     setIsDropdownOpen(false);
   };
 
-  const handleSignOut = () => {
-    logout();
+  const handleSignOut = async () => {
+    await logout();
     setIsDropdownOpen(false);
+    // Redirect to non-admin Visual Vault page
+    navigate('/visual-vault');
   };
 
   return (
