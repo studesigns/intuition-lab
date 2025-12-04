@@ -1,8 +1,8 @@
 /* Compliance Engine Styling - Dashboard-inspired with Aurora Orbs */
 
-/* Override aurora-container z-index to bring orbs ABOVE all content */
+/* Ensure aurora-container is visible behind panels but on top of base background */
 .aurora-container {
-  z-index: 100 !important;
+  z-index: 5 !important;
 }
 
 .compliance-container {
