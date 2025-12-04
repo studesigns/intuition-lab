@@ -1,19 +1,32 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Particles } from 'react-tsparticles';
 import { loadSlim } from 'tsparticles-slim';
 
 export default function TechNodes() {
+  const particlesInitialized = useRef(false);
+  const mouseListenerAdded = useRef(false);
+
   const particlesInit = useCallback(async (engine) => {
+    if (particlesInitialized.current) {
+      console.log('TechNodes: Already initialized, skipping');
+      return;
+    }
     console.log('TechNodes: Initializing...');
     await loadSlim(engine);
     console.log('TechNodes: Loaded');
+    particlesInitialized.current = true;
   }, []);
 
   const particlesLoaded = useCallback(async (container) => {
     console.log('TechNodes: Ready', container);
 
-    // Add mouse tracking to conditionally enable/disable particle interactivity
-    window.addEventListener('mousemove', (e) => {
+    // Add mouse tracking only once to avoid duplicate listeners
+    if (mouseListenerAdded.current) {
+      console.log('TechNodes: Mouse listener already added, skipping');
+      return;
+    }
+
+    const handleMouseMove = (e) => {
       const target = e.target;
       const isOverInteractive = target.tagName === 'BUTTON' ||
                                target.tagName === 'INPUT' ||
@@ -33,7 +46,16 @@ export default function TechNodes() {
           container.options.interactivity.events.onHover.enable = true;
         }
       }
-    });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    mouseListenerAdded.current = true;
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      mouseListenerAdded.current = false;
+    };
   }, []);
 
   const particlesOptions = {
