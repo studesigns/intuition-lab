@@ -4,6 +4,7 @@ import { VideoContext, INDUSTRIES } from '../context/VideoContext';
 import VideoHeader from '../components/VideoHeader';
 import VideoRow from '../components/VideoRow';
 import VideoModal from '../components/VideoModal';
+import LoginModal from '../components/LoginModal';
 import { Play, Info } from 'lucide-react';
 
 const containerVariants = {
@@ -448,6 +449,9 @@ export default function VisualVault() {
           onClose={() => setSelectedVideo(null)}
         />
       )}
+
+      {/* Login Modal */}
+      <LoginModal />
     </>
   );
 }
