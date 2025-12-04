@@ -82,7 +82,7 @@ export default function TechNodes() {
       },
     },
     interactivity: {
-      detect_on: 'window',
+      detect_on: 'canvas',
       events: {
         onHover: {
           enable: true,
