@@ -39,7 +39,7 @@ const duplicateVideoForDemo = (video, count = 10) => {
 export default function VisualVault() {
   const { videos, featuredVideos, loading } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [activeCategory, setActiveCategory] = useState('Home');
+  const [activeCategory, setActiveCategory] = useState('All');
 
   // Callback to handle video selection
   const handleVideoPlay = useCallback((video) => {
@@ -51,8 +51,8 @@ export default function VisualVault() {
   const createCategoryRows = () => {
     const rows = {};
 
-    // If showing "Home", show all featured + categorized videos
-    if (activeCategory === 'Home') {
+    // If showing "All", show all featured + categorized videos
+    if (activeCategory === 'All') {
       // If we have featured videos, create special categories with demo duplication
       if (featuredVideos.length > 0) {
         rows['Trending Now'] = duplicateVideoForDemo(featuredVideos[0], 10);
@@ -432,7 +432,7 @@ export default function VisualVault() {
         </motion.div>
 
         {/* Empty State - No Videos for Selected Category */}
-        {activeCategory !== 'Home' && categories.length === 0 && !loading && (
+        {activeCategory !== 'All' && categories.length === 0 && !loading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

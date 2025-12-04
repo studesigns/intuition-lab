@@ -4,9 +4,9 @@ import { VideoContext } from '../context/VideoContext';
 import { VoiceContext } from '../context/VoiceContext';
 import { Film, User, LogOut, Settings } from 'lucide-react';
 
-const CATEGORIES = ['Home', 'Healthcare', 'Finance', 'Retail'];
+const CATEGORIES = ['All', 'Healthcare', 'Finance', 'Retail'];
 
-export default function VideoHeader({ activeCategory = 'Home', onCategoryChange = null }) {
+export default function VideoHeader({ activeCategory = 'All', onCategoryChange = null }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin: videoIsAdmin } = useContext(VideoContext);
@@ -146,6 +146,31 @@ export default function VideoHeader({ activeCategory = 'Home', onCategoryChange 
             justifyContent: 'center',
           }}
         >
+          {/* Home Button - Navigate to Dashboard */}
+          <button
+            onClick={() => navigate('/')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#b0b9c3',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              padding: '0.5rem 0',
+              borderBottom: 'none',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#b0b9c3';
+            }}
+          >
+            Home
+          </button>
+
+          {/* Category Filters */}
           {CATEGORIES.map((category) => (
             <button
               key={category}
