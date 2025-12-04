@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, ShieldAlert } from 'lucide-react';
+import { Zap, ShieldAlert, Film } from 'lucide-react';
 import TechNodes from '../components/TechNodes';
 import '../styles/Dashboard.css';
 import '../styles/AuroraBackground.css';
@@ -148,6 +148,28 @@ export default function Dashboard() {
               </div>
               <h2>Compliance Risk Engine</h2>
               <p>Analyze and mitigate compliance risks across your organization</p>
+              <div className="card-action">Explore →</div>
+            </motion.div>
+
+            <motion.div
+              className="tool-card visual-vault"
+              onClick={() => navigate('/visual-vault')}
+              variants={cardVariants}
+              whileHover={{
+                scale: 1.02,
+                y: -10,
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 400,
+                damping: 30,
+              }}
+            >
+              <div className="card-icon">
+                <Film size={48} />
+              </div>
+              <h2>Visual Vault</h2>
+              <p>Netflix-style portfolio gallery showcasing client work and projects</p>
               <div className="card-action">Explore →</div>
             </motion.div>
           </motion.div>
