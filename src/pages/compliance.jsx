@@ -382,21 +382,56 @@ export default function Compliance() {
             marginRight: '0.5rem',
           }}
         >
-          {/* Header with Collapse Button */}
+          {/* Sidebar Header - Flex Column Layout */}
           <div style={{
-            padding: isPanelCollapsed && !isMobile ? '1.25rem 0.75rem' : '1.25rem 1rem',
+            padding: isPanelCollapsed && !isMobile ? '1rem 0.75rem' : '1.25rem 1rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            flexDirection: 'column',
+            gap: '1.5rem',
             minHeight: isPanelCollapsed && !isMobile ? '60px' : 'auto',
           }}>
+
+            {/* 1. Collapse/Expand Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
+                style={{
+                  padding: '0.5rem',
+                  background: 'transparent',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '6px',
+                  color: '#cbd5e1',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'auto',
+                  zIndex: 15,
+                  width: '2rem',
+                  height: '2rem',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(8, 145, 178, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+                title={isPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {isPanelCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+              </button>
+            </div>
+
+            {/* 2. Title Section (Naturally pushed down by the gap above) */}
             {!isPanelCollapsed && (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.75rem',
-                flex: 1,
+                justifyContent: 'space-between',
               }}>
                 <h2 style={{
                   fontSize: '1.1rem',
@@ -428,37 +463,6 @@ export default function Compliance() {
                 </div>
               </div>
             )}
-
-            {/* Collapse/Expand Button */}
-            <button
-              onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
-              style={{
-                padding: '0.5rem',
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '6px',
-                color: '#cbd5e1',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: isPanelCollapsed && !isMobile ? 'auto' : '0.5rem',
-                pointerEvents: 'auto',
-                zIndex: 15,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(8, 145, 178, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              title={isPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {isPanelCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </button>
           </div>
 
           {/* Error Banner */}
@@ -670,19 +674,22 @@ export default function Compliance() {
             zIndex: 10,
             position: 'relative',
             pointerEvents: 'auto',
+            padding: '1.5rem',
           }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
         >
-          {/* Chat Window */}
+          {/* Chat Window - Centered Container with Max Width */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '1.25rem',
             display: 'flex',
             flexDirection: 'column',
             gap: '1rem',
+            maxWidth: '55rem',
+            width: '100%',
+            margin: '0 auto',
           }}>
             {conversation.length === 0 && (
               <motion.div
