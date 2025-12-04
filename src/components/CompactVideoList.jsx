@@ -1,4 +1,4 @@
-import { Trash2, Star } from 'lucide-react';
+import { Trash2, Star, Edit2 } from 'lucide-react';
 import { formatDuration } from '../utils/cloudinaryHelper';
 
 export default function CompactVideoList({
@@ -6,6 +6,7 @@ export default function CompactVideoList({
   onDelete,
   onToggleFeatured,
   onPreview,
+  onEdit,
 }) {
   if (!videos || videos.length === 0) {
     return (
@@ -228,6 +229,34 @@ export default function CompactVideoList({
                   title={video.isFeatured ? 'Remove from featured' : 'Add to featured'}
                 >
                   <Star size={16} color={video.isFeatured ? '#000000' : '#ffffff'} fill={video.isFeatured ? '#000000' : 'none'} />
+                </button>
+
+                {/* Edit Button */}
+                <button
+                  onClick={() => onEdit && onEdit(video)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    background: 'rgba(8, 145, 178, 0.6)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.9)';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(8, 145, 178, 0.6)';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title="Edit video"
+                >
+                  <Edit2 size={16} color="#ffffff" />
                 </button>
 
                 {/* Delete Button */}

@@ -33,11 +33,13 @@ const itemVariants = {
 export default function VisualVaultAdmin() {
   const navigate = useNavigate();
   const { isAdmin, setShowLoginModal } = useContext(VoiceContext);
-  const { videos, loading, addVideo, deleteVideo, toggleFeatured } = useContext(VideoContext);
+  const { videos, loading, addVideo, updateVideo, deleteVideo, toggleFeatured } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [editingVideo, setEditingVideo] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Show login modal if not authenticated
   useEffect(() => {
@@ -61,6 +63,32 @@ export default function VisualVaultAdmin() {
       }
     } catch (err) {
       setError(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Handle video edit
+  const handleEditVideo = (video) => {
+    setEditingVideo(video);
+  };
+
+  // Handle video update
+  const handleUpdateVideo = async (videoId, updatedData) => {
+    setUploading(true);
+    setError(null);
+
+    try {
+      const result = await updateVideo(videoId, updatedData);
+      if (result.success) {
+        setUploadSuccess(true);
+        setEditingVideo(null);
+        setTimeout(() => setUploadSuccess(false), 3000);
+      } else {
+        setError(result.error || 'Failed to update video');
+      }
+    } catch (err) {
+      setError(err.message || 'Update failed');
     } finally {
       setUploading(false);
     }
@@ -195,7 +223,12 @@ export default function VisualVaultAdmin() {
 
         {/* Upload Section */}
         <div style={{ marginBottom: '2rem' }}>
-          <CompactUploadPanel onUploadSuccess={handleUploadSuccess} />
+          <CompactUploadPanel
+            onUploadSuccess={handleUploadSuccess}
+            editingVideo={editingVideo}
+            onEditModeChange={setIsEditMode}
+            onUpdateVideo={handleUpdateVideo}
+          />
         </div>
 
         {/* Library Section */}
@@ -255,6 +288,7 @@ export default function VisualVaultAdmin() {
               onDelete={handleDelete}
               onToggleFeatured={handleToggleFeatured}
               onPreview={(video) => setSelectedVideo(video)}
+              onEdit={handleEditVideo}
             />
           )}
         </div>

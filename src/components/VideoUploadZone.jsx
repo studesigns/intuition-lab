@@ -4,7 +4,7 @@ import { Upload, X } from 'lucide-react';
 import { uploadVideoToCloudinary, validateVideoFile, formatFileSize } from '../utils/cloudinaryHelper';
 import { INDUSTRIES } from '../context/VideoContext';
 
-export default function VideoUploadZone({ onUploadSuccess }) {
+export default function VideoUploadZone({ onUploadSuccess, compact = false }) {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -20,6 +20,13 @@ export default function VideoUploadZone({ onUploadSuccess }) {
     industries: [],
     customTags: '',
   });
+
+  // Compact mode styles
+  const compactContainerStyle = {
+    background: 'transparent',
+    border: 'none',
+    padding: 0,
+  };
 
   // Handle drag events
   const handleDrag = (e) => {

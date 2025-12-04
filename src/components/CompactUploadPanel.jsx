@@ -3,13 +3,14 @@ import { Upload, X } from 'lucide-react';
 import { uploadVideoToCloudinary, validateVideoFile, formatFileSize, formatDuration } from '../utils/cloudinaryHelper';
 import { INDUSTRIES } from '../context/VideoContext';
 
-export default function CompactUploadPanel({ onUploadSuccess }) {
+export default function CompactUploadPanel({ onUploadSuccess, onEditModeChange, editingVideo, onUpdateVideo }) {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [uploadedData, setUploadedData] = useState(null);
   const [error, setError] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -18,6 +19,29 @@ export default function CompactUploadPanel({ onUploadSuccess }) {
     industries: [],
     customTags: '',
   });
+
+  // Handle when editingVideo prop changes
+  React.useEffect(() => {
+    if (editingVideo) {
+      // Populate form with video data
+      setFormData({
+        title: editingVideo.title || '',
+        clientName: editingVideo.clientName || '',
+        description: editingVideo.description || '',
+        industries: editingVideo.industries || [],
+        customTags: editingVideo.customTags?.join(', ') || '',
+      });
+      setIsEditMode(true);
+      setUploadedFile(null);
+      setUploadedData(null);
+      setError(null);
+      if (onEditModeChange) {
+        onEditModeChange(true);
+      }
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [editingVideo, onEditModeChange]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -84,28 +108,66 @@ export default function CompactUploadPanel({ onUploadSuccess }) {
       return;
     }
 
-    const videoData = {
-      ...uploadedData,
-      title: formData.title,
-      clientName: formData.clientName,
-      description: formData.description,
-      industries: formData.industries,
-      customTags: formData.customTags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0),
-      isFeatured: false,
-      featuredOrder: 0,
-    };
+    if (isEditMode && editingVideo) {
+      // UPDATE MODE - don't require video file
+      const updatedData = {
+        title: formData.title,
+        clientName: formData.clientName,
+        description: formData.description,
+        industries: formData.industries,
+        customTags: formData.customTags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0),
+      };
 
-    if (onUploadSuccess) {
-      onUploadSuccess(videoData);
+      if (onUpdateVideo) {
+        onUpdateVideo(editingVideo.id, updatedData);
+      }
+
+      handleCancel();
+    } else {
+      // CREATE MODE - require video file
+      if (!uploadedData) {
+        setError('Please upload a video first');
+        return;
+      }
+
+      const videoData = {
+        ...uploadedData,
+        title: formData.title,
+        clientName: formData.clientName,
+        description: formData.description,
+        industries: formData.industries,
+        customTags: formData.customTags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0),
+        isFeatured: false,
+        featuredOrder: 0,
+      };
+
+      if (onUploadSuccess) {
+        onUploadSuccess(videoData);
+      }
+
+      setFormData({ title: '', clientName: '', description: '', industries: [], customTags: '' });
+      setUploadedFile(null);
+      setUploadedData(null);
+      setUploadProgress(0);
     }
+  };
 
+  const handleCancel = () => {
     setFormData({ title: '', clientName: '', description: '', industries: [], customTags: '' });
     setUploadedFile(null);
     setUploadedData(null);
     setUploadProgress(0);
+    setIsEditMode(false);
+    setError(null);
+    if (onEditModeChange) {
+      onEditModeChange(false);
+    }
   };
 
   return (
@@ -514,31 +576,57 @@ export default function CompactUploadPanel({ onUploadSuccess }) {
               />
             </div>
 
-            {/* Row 4: Upload Button (Aligned Right) */}
-            <button
-              onClick={handleSubmit}
-              style={{
-                padding: '0.75rem 1.5rem',
-                background: '#0891b2',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                float: 'right',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#06b6d4';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0891b2';
-              }}
-            >
-              Upload Video
-            </button>
-            <div style={{ clear: 'both' }} />
+            {/* Row 4: Upload Button + Cancel Button (if in edit mode) */}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+              {isEditMode && (
+                <button
+                  onClick={handleCancel}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    background: 'transparent',
+                    color: '#cbd5e1',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+              <button
+                onClick={handleSubmit}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: '#0891b2',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#06b6d4';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#0891b2';
+                }}
+              >
+                {isEditMode ? 'Update Video' : 'Upload Video'}
+              </button>
+            </div>
         </div>
       </div>
 
