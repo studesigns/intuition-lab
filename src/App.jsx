@@ -4,6 +4,8 @@ import VoPlayer from './pages/vo-player';
 import Compliance from './pages/compliance';
 import VisualVault from './pages/visual-vault';
 import VisualVaultAdmin from './pages/visual-vault-admin';
+import InactivityWarning from './components/InactivityWarning';
+import VersionCheck from './components/VersionCheck';
 import { VoiceProvider } from './context/VoiceContext';
 import { VideoProvider } from './context/VideoContext';
 import './App.css';
@@ -12,6 +14,8 @@ function App() {
   return (
     <VoiceProvider>
       <VideoProvider>
+        <InactivityWarning />
+        <VersionCheck />
         <Router>
           <Routes>
             <Route path="/" element={<Dashboard />} />

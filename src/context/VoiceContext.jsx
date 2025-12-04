@@ -106,6 +106,12 @@ export function VoiceProvider({ children }) {
   const [voices, setVoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showInactivityWarning, setShowInactivityWarning] = useState(false);
+  const [lastActivityTime, setLastActivityTime] = useState(Date.now());
+
+  // Inactivity Constants (in milliseconds)
+  const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+  const WARNING_TIMEOUT = 30 * 1000; // 30 seconds before logout
 
   // Authentication State - EXACT: lines 134-140
   useEffect(() => {
@@ -132,6 +138,53 @@ export function VoiceProvider({ children }) {
     });
     return () => unsubscribe();
   }, []);
+
+  // Inactivity Check - Warn user after 10 minutes
+  useEffect(() => {
+    if (!isAdmin) return; // Only for admin
+
+    const inactivityTimer = setInterval(() => {
+      const timeSinceLastActivity = Date.now() - lastActivityTime;
+      if (timeSinceLastActivity >= INACTIVITY_TIMEOUT) {
+        setShowInactivityWarning(true);
+      }
+    }, 1000);
+
+    return () => clearInterval(inactivityTimer);
+  }, [isAdmin, lastActivityTime, INACTIVITY_TIMEOUT]);
+
+  // Auto-logout if user doesn't respond within WARNING_TIMEOUT
+  useEffect(() => {
+    if (!showInactivityWarning) return;
+
+    const logoutTimer = setTimeout(async () => {
+      await logout();
+      setShowInactivityWarning(false);
+    }, WARNING_TIMEOUT);
+
+    return () => clearTimeout(logoutTimer);
+  }, [showInactivityWarning, WARNING_TIMEOUT]);
+
+  // Track user activity (only when admin)
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const handleActivity = () => {
+      setLastActivityTime(Date.now());
+      setShowInactivityWarning(false); // Dismiss warning if shown
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => {
+      document.addEventListener(event, handleActivity);
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleActivity);
+      });
+    };
+  }, [isAdmin]);
 
   // Authentication Methods - EXACT: lines 159-166
   const login = async (email, password) => {
@@ -171,7 +224,9 @@ export function VoiceProvider({ children }) {
     logout,
     addVoice,
     updateVoice,
-    deleteVoice
+    deleteVoice,
+    showInactivityWarning,
+    setShowInactivityWarning,
   };
 
   return (

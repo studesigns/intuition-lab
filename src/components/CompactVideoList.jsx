@@ -213,7 +213,7 @@ export default function CompactVideoList({
                     width: '32px',
                     height: '32px',
                     padding: '0',
-                    background: video.isFeatured ? '#fbbf24' : 'rgba(100, 116, 139, 0.5)',
+                    background: video.isFeatured ? '#fbbf24' : '#64748b',
                     border: 'none',
                     borderRadius: '6px',
                     display: 'flex',
@@ -222,18 +222,28 @@ export default function CompactVideoList({
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
                     flexShrink: 0,
+                    boxShadow: video.isFeatured ? '0 0 12px rgba(251, 191, 36, 0.5)' : 'none',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.1)';
-                    e.currentTarget.style.boxShadow = '0 0 8px rgba(8, 145, 178, 0.5)';
+                    e.currentTarget.style.transform = 'scale(1.15)';
+                    if (!video.isFeatured) {
+                      e.currentTarget.style.background = '#78828f';
+                    } else {
+                      e.currentTarget.style.background = '#fcd34d';
+                    }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.background = video.isFeatured ? '#fbbf24' : '#64748b';
                   }}
-                  title={video.isFeatured ? 'Remove from featured' : 'Add to featured'}
+                  title={video.isFeatured ? '⭐ Remove from featured' : '☆ Add to featured'}
                 >
-                  <Star size={18} color={video.isFeatured ? '#000000' : '#ffffff'} fill={video.isFeatured ? '#fbbf24' : 'none'} strokeWidth={2} />
+                  <Star
+                    size={18}
+                    color={video.isFeatured ? '#1f2937' : '#ffffff'}
+                    fill={video.isFeatured ? '#fbbf24' : '#94a3b8'}
+                    strokeWidth={2.5}
+                  />
                 </button>
 
                 {/* Edit Button */}
