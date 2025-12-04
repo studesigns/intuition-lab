@@ -92,15 +92,17 @@ export default function VideoModal({ video, onClose }) {
     >
       <div
         style={{
+          position: 'relative',
+          zIndex: 1001,
           backgroundColor: '#0f172a',
-          border: '1px solid rgba(8, 145, 178, 0.4)',
+          border: '2px solid rgba(8, 145, 178, 0.6)',
           borderRadius: '16px',
           padding: '2rem',
           maxWidth: '1200px',
-          width: '100%',
+          width: '95%',
           maxHeight: '90vh',
           overflowY: 'auto',
-          boxShadow: '0 0 40px rgba(8, 145, 178, 0.3), 0 0 60px rgba(8, 145, 178, 0.1)',
+          boxShadow: '0 0 40px rgba(8, 145, 178, 0.3), 0 0 60px rgba(8, 145, 178, 0.1), 0 0 80px rgba(8, 145, 178, 0.2)',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -113,15 +115,15 @@ export default function VideoModal({ video, onClose }) {
             right: '1.5rem',
             width: '40px',
             height: '40px',
-            background: 'rgba(100, 116, 139, 0.5)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'rgba(100, 116, 139, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
-            zIndex: 10,
+            zIndex: 1002,
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.background = 'rgba(220, 38, 38, 0.8)';
@@ -142,22 +144,32 @@ export default function VideoModal({ video, onClose }) {
           borderRadius: '12px',
           overflow: 'hidden',
           marginBottom: '2rem',
-          border: '1px solid rgba(8, 145, 178, 0.3)',
-          boxShadow: '0 8px 32px rgba(8, 145, 178, 0.2)',
+          border: '1px solid rgba(8, 145, 178, 0.5)',
+          boxShadow: '0 8px 32px rgba(8, 145, 178, 0.3)',
+          position: 'relative',
         }}>
-          <video
-            ref={videoRef}
-            src={video.cloudinaryUrl}
-            poster={video.thumbnailUrl}
-            controls
-            autoPlay
-            style={{
-              width: '100%',
-              height: 'auto',
-              display: 'block',
-              maxHeight: '500px',
-            }}
-          />
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            paddingBottom: '56.25%',
+            backgroundColor: '#000000',
+          }}>
+            <video
+              ref={videoRef}
+              src={video.cloudinaryUrl}
+              poster={video.thumbnailUrl}
+              controls
+              autoPlay
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'block',
+              }}
+            />
+          </div>
         </div>
 
         {/* Metadata Section */}
@@ -165,6 +177,8 @@ export default function VideoModal({ video, onClose }) {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '2rem',
+          position: 'relative',
+          zIndex: 1,
         }}>
           {/* Left: Title and Description */}
           <div>
