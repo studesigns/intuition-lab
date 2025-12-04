@@ -39,7 +39,7 @@ const duplicateVideoForDemo = (video, count = 10) => {
 export default function VisualVault() {
   const { videos, featuredVideos, loading } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('Home');
 
   // Callback to handle video selection
   const handleVideoPlay = useCallback((video) => {
@@ -51,23 +51,35 @@ export default function VisualVault() {
   const createCategoryRows = () => {
     const rows = {};
 
-    // If we have featured videos, create special categories with demo duplication
-    if (featuredVideos.length > 0) {
-      rows['Trending Now'] = duplicateVideoForDemo(featuredVideos[0], 10);
-      rows['New Releases'] = duplicateVideoForDemo(featuredVideos[0], 8);
-    }
-
-    // Group videos by industry (with demo duplication if low count)
-    INDUSTRIES.forEach(industry => {
-      const industryVideos = videos.filter(v => v.industries?.includes(industry));
-      if (industryVideos.length > 0) {
-        // If only 1-2 videos, duplicate them for demo purposes
-        const displayVideos = industryVideos.length <= 2
-          ? duplicateVideoForDemo(industryVideos[0], 10)
-          : industryVideos;
-        rows[industry] = displayVideos;
+    // If showing "Home", show all featured + categorized videos
+    if (activeCategory === 'Home') {
+      // If we have featured videos, create special categories with demo duplication
+      if (featuredVideos.length > 0) {
+        rows['Trending Now'] = duplicateVideoForDemo(featuredVideos[0], 10);
+        rows['New Releases'] = duplicateVideoForDemo(featuredVideos[0], 8);
       }
-    });
+
+      // Group videos by industry (with demo duplication if low count)
+      INDUSTRIES.forEach(industry => {
+        const industryVideos = videos.filter(v => v.industries?.includes(industry));
+        if (industryVideos.length > 0) {
+          // If only 1-2 videos, duplicate them for demo purposes
+          const displayVideos = industryVideos.length <= 2
+            ? duplicateVideoForDemo(industryVideos[0], 10)
+            : industryVideos;
+          rows[industry] = displayVideos;
+        }
+      });
+    } else {
+      // If showing a specific category, only show videos from that industry
+      const categoryVideos = videos.filter(v => v.industries?.includes(activeCategory));
+      if (categoryVideos.length > 0) {
+        const displayVideos = categoryVideos.length <= 2
+          ? duplicateVideoForDemo(categoryVideos[0], 10)
+          : categoryVideos;
+        rows[activeCategory] = displayVideos;
+      }
+    }
 
     return rows;
   };
@@ -129,7 +141,7 @@ export default function VisualVault() {
       />
 
       {/* Header */}
-      <VideoHeader />
+      <VideoHeader activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
 
       {/* Main Content */}
       <div
@@ -419,7 +431,29 @@ export default function VisualVault() {
           ))}
         </motion.div>
 
-        {/* Empty State */}
+        {/* Empty State - No Videos for Selected Category */}
+        {activeCategory !== 'Home' && categories.length === 0 && !loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{
+              textAlign: 'center',
+              padding: '4rem 2rem',
+              maxWidth: '1400px',
+              margin: '0 auto',
+            }}
+          >
+            <p style={{
+              fontSize: '1.125rem',
+              color: '#64748b',
+              margin: 0,
+            }}>
+              Nothing here yet... stay tuned.
+            </p>
+          </motion.div>
+        )}
+
+        {/* Empty State - No Videos at All */}
         {videos.length === 0 && !loading && (
           <motion.div
             initial={{ opacity: 0 }}

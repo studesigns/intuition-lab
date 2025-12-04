@@ -6,7 +6,7 @@ import { Film, User, LogOut, Settings } from 'lucide-react';
 
 const CATEGORIES = ['Home', 'Healthcare', 'Finance', 'Retail'];
 
-export default function VideoHeader() {
+export default function VideoHeader({ activeCategory = 'Home', onCategoryChange = null }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin: videoIsAdmin } = useContext(VideoContext);
@@ -14,7 +14,6 @@ export default function VideoHeader() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('Home');
   const dropdownRef = useRef(null);
 
   // Detect scroll position
@@ -38,7 +37,9 @@ export default function VideoHeader() {
   }, []);
 
   const handleCategoryClick = (category) => {
-    setActiveCategory(category);
+    if (onCategoryChange) {
+      onCategoryChange(category);
+    }
     setIsDropdownOpen(false);
   };
 
