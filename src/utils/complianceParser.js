@@ -248,6 +248,11 @@ function cleanupDetails(answer) {
   cleaned = cleaned.replace(/^COMPLIANCE STATUS:.*?\n/gim, '');
   cleaned = cleaned.replace(/^ANALYSIS:/m, '');
 
+  // Insert double newlines before key headers for proper formatting
+  cleaned = cleaned.replace(/\*\*Recommended Action:\*\*/g, '\n\n**Recommended Action:**');
+  cleaned = cleaned.replace(/\*\*Summary:\*\*/g, '\n\n**Summary:**');
+  cleaned = cleaned.replace(/\*\*Analysis by Location:\*\*/g, '\n\n**Analysis by Location:**');
+
   // Remove markdown formatting
   cleaned = cleaned.replace(/\*\*(.+?)\*\*/g, '$1');
   cleaned = cleaned.replace(/\*(.+?)\*/g, '$1');
