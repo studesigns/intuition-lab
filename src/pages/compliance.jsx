@@ -314,52 +314,16 @@ export default function Compliance() {
 
       <TechNodes />
 
-      {/* Fixed Return to Dashboard Button */}
-      <motion.button
-        onClick={() => navigate('/')}
-        style={{
-          position: 'fixed',
-          top: '1rem',
-          left: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.5rem 1.25rem',
-          background: 'rgba(30, 41, 59, 0.9)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '8px',
-          color: '#cbd5e1',
-          fontSize: '0.8rem',
-          fontWeight: '500',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          zIndex: 100,
-          pointerEvents: 'auto',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
-          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(30, 41, 59, 0.9)';
-          e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-        }}
-      >
-        <ArrowLeft size={16} />
-        Dashboard
-      </motion.button>
-
-      {/* Main Content Area */}
+      {/* Main Content Area - With Padding */}
       <div className="compliance-container" style={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
-        height: 'calc(100vh - 0px)',
+        height: '100vh',
         maxWidth: '100%',
         overflow: 'hidden',
         pointerEvents: 'auto',
         position: 'relative',
+        padding: isMobile ? '1rem' : '2.5rem',
       }}>
 
         {/* Left Panel: Document Vault - Collapsible */}
@@ -388,11 +352,46 @@ export default function Compliance() {
             borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1.5rem',
+            gap: '1rem',
             minHeight: isPanelCollapsed && !isMobile ? '60px' : 'auto',
           }}>
 
-            {/* 1. Collapse/Expand Button */}
+            {/* 1. Dashboard Back Button */}
+            {!isPanelCollapsed && (
+              <motion.button
+                onClick={() => navigate('/')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1.25rem',
+                  background: 'rgba(30, 41, 59, 0.8)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '0.8rem',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  pointerEvents: 'auto',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(30, 41, 59, 0.95)';
+                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(30, 41, 59, 0.8)';
+                  e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                }}
+              >
+                <ArrowLeft size={16} />
+                Dashboard
+              </motion.button>
+            )}
+
+            {/* 2. Collapse/Expand Button */}
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
@@ -426,7 +425,7 @@ export default function Compliance() {
               </button>
             </div>
 
-            {/* 2. Title Section (Naturally pushed down by the gap above) */}
+            {/* 3. Title Section (Naturally pushed down by the gap above) */}
             {!isPanelCollapsed && (
               <div style={{
                 display: 'flex',
