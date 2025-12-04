@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { VideoContext } from '../context/VideoContext';
 import { VoiceContext } from '../context/VoiceContext';
 import { Film, User, LogOut, Settings } from 'lucide-react';
+import SignOutConfirmationModal from './SignOutConfirmationModal';
 
 const CATEGORIES = ['All', 'Healthcare', 'Finance', 'Retail'];
 
@@ -14,6 +15,7 @@ export default function VideoHeader({ activeCategory = 'All', onCategoryChange =
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const dropdownRef = useRef(null);
 
   // Detect scroll position
@@ -43,31 +45,37 @@ export default function VideoHeader({ activeCategory = 'All', onCategoryChange =
     setIsDropdownOpen(false);
   };
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
+    setShowSignOutConfirm(true);
+  };
+
+  const handleConfirmSignOut = async () => {
     await logout();
+    setShowSignOutConfirm(false);
     setIsDropdownOpen(false);
     // Redirect to non-admin Visual Vault page
     navigate('/visual-vault');
   };
 
   return (
-    <header
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        width: '100%',
-        background: isScrolled
-          ? '#0a0a0a'
-          : 'linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: 'none',
-        transition: 'background-color 0.3s ease',
-      }}
-    >
+    <>
+      <header
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          width: '100%',
+          background: isScrolled
+            ? '#0a0a0a'
+            : 'linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: 'none',
+          transition: 'background-color 0.3s ease',
+        }}
+      >
       <div
         style={{
           maxWidth: '1400px',
@@ -397,6 +405,14 @@ export default function VideoHeader({ activeCategory = 'All', onCategoryChange =
           </button>
         )}
       </div>
-    </header>
+      </header>
+
+      {/* Sign Out Confirmation Modal */}
+      <SignOutConfirmationModal
+        isOpen={showSignOutConfirm}
+        onConfirm={handleConfirmSignOut}
+        onCancel={() => setShowSignOutConfirm(false)}
+      />
+    </>
   );
 }
