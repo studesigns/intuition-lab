@@ -145,87 +145,110 @@ export default function CompactUploadPanel({ onUploadSuccess }) {
         </div>
       )}
 
-      {!uploadedData ? (
-        /* 2-Column Layout */
+      {/* MAIN 2-COLUMN GRID - Always visible */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 2fr',
+        gap: '2rem',
+        alignItems: 'start',
+      }}>
+        {/* LEFT COLUMN: Upload Zone OR File Info Preview */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 2fr',
-          gap: '2rem',
-          alignItems: 'start',
-        }}>
-          {/* Left: Upload Zone (col-span-4 equivalent) */}
-          <div
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            style={{
-              border: dragActive ? '2px solid #0891b2' : '2px dashed rgba(255, 255, 255, 0.2)',
-              background: dragActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent',
-              borderRadius: '12px',
-              padding: '2rem',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              aspectRatio: '1',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <input
-              type="file"
-              onChange={handleFileInput}
-              accept="video/*"
-              style={{ display: 'none' }}
-              id="video-input-compact"
-              disabled={uploading}
-            />
+          borderRadius: '12px',
+          padding: '2rem',
+          textAlign: 'center',
+          transition: 'all 0.3s ease',
+          aspectRatio: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: uploadedData ? 'none' : (dragActive ? '2px solid #0891b2' : '2px dashed rgba(255, 255, 255, 0.2)'),
+          background: uploadedData ? 'rgba(8, 145, 178, 0.05)' : (dragActive ? 'rgba(8, 145, 178, 0.1)' : 'transparent'),
+          cursor: uploadedData ? 'default' : 'pointer',
+        }}
+          {...(uploadedData ? {} : { onDragEnter: handleDrag, onDragLeave: handleDrag, onDragOver: handleDrag, onDrop: handleDrop })}
+        >
+          {/* IF NO FILE: Show Drop Zone */}
+          {!uploadedData && (
+            <>
+              <input
+                type="file"
+                onChange={handleFileInput}
+                accept="video/*"
+                style={{ display: 'none' }}
+                id="video-input-compact"
+                disabled={uploading}
+              />
 
-            {uploading ? (
-              <div>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  border: '3px solid rgba(8, 145, 178, 0.2)',
-                  borderTopColor: '#0891b2',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 1rem',
-                }} />
-                <p style={{ fontSize: '0.875rem', color: '#cbd5e1', margin: '0.5rem 0' }}>
-                  {uploadProgress}%
-                </p>
-              </div>
-            ) : (
-              <>
-                <Upload size={40} color="#22d3ee" style={{ marginBottom: '1rem' }} />
-                <p style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff', margin: '0 0 0.5rem 0' }}>
-                  Drag video here
-                </p>
-                <label
-                  htmlFor="video-input-compact"
-                  style={{
-                    display: 'inline-block',
-                    marginTop: '0.75rem',
-                    padding: '0.5rem 1rem',
-                    background: '#0891b2',
-                    color: '#ffffff',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                  }}
-                >
-                  Browse
-                </label>
-              </>
-            )}
-          </div>
+              {uploading ? (
+                <div>
+                  <div style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
+                    border: '3px solid rgba(8, 145, 178, 0.2)',
+                    borderTopColor: '#0891b2',
+                    animation: 'spin 1s linear infinite',
+                    margin: '0 auto 1rem',
+                  }} />
+                  <p style={{ fontSize: '0.875rem', color: '#cbd5e1', margin: '0.5rem 0' }}>
+                    {uploadProgress}%
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <Upload size={40} color="#22d3ee" style={{ marginBottom: '1rem' }} />
+                  <p style={{ fontSize: '0.875rem', fontWeight: '600', color: '#ffffff', margin: '0 0 0.5rem 0' }}>
+                    Drag video here
+                  </p>
+                  <label
+                    htmlFor="video-input-compact"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '0.75rem',
+                      padding: '0.5rem 1rem',
+                      background: '#0891b2',
+                      color: '#ffffff',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Browse
+                  </label>
+                </>
+              )}
+            </>
+          )}
 
-          {/* Right: Form Fields (col-span-8 equivalent) */}
-          <div>
+          {/* IF FILE UPLOADED: Show File Info Preview */}
+          {uploadedData && (
+            <div style={{
+              width: '100%',
+            }}>
+              <p style={{ margin: '0 0 0.5rem 0', color: '#cbd5e1', fontSize: '0.875rem' }}>
+                <strong>File:</strong>
+              </p>
+              <p style={{ margin: '0 0 1rem 0', color: '#e2e8f0', fontSize: '0.875rem', wordBreak: 'break-word' }}>
+                {uploadedFile?.name}
+              </p>
+              <p style={{ margin: '0 0 0.5rem 0', color: '#cbd5e1', fontSize: '0.875rem' }}>
+                <strong>Size:</strong> {formatFileSize(uploadedFile?.size)}
+              </p>
+              <p style={{ margin: '0 0 0.5rem 0', color: '#cbd5e1', fontSize: '0.875rem' }}>
+                <strong>Duration:</strong> {formatDuration(uploadedData.duration)}
+              </p>
+              <p style={{ margin: '0', color: '#cbd5e1', fontSize: '0.875rem' }}>
+                <strong>Resolution:</strong> {uploadedData.width}x{uploadedData.height}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT COLUMN: Form Fields (ALWAYS Visible) */}
+        <div>
             {/* Row 1: Title (50%) + Client Name (50%) */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
               <div>
@@ -483,30 +506,8 @@ export default function CompactUploadPanel({ onUploadSuccess }) {
               Upload Video
             </button>
             <div style={{ clear: 'both' }} />
-          </div>
         </div>
-      ) : (
-        /* Video Info Display */
-        <div style={{
-          background: 'rgba(8, 145, 178, 0.1)',
-          border: '1px solid rgba(8, 145, 178, 0.2)',
-          borderRadius: '8px',
-          padding: '1rem',
-          marginBottom: '1rem',
-          fontSize: '0.875rem',
-          color: '#cbd5e1',
-        }}>
-          <p style={{ margin: '0 0 0.5rem 0' }}>
-            <strong>File:</strong> {uploadedFile?.name} ({formatFileSize(uploadedFile?.size)})
-          </p>
-          <p style={{ margin: '0 0 0.5rem 0' }}>
-            <strong>Duration:</strong> {formatDuration(uploadedData.duration)}
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Resolution:</strong> {uploadedData.width}x{uploadedData.height}
-          </p>
-        </div>
-      )}
+      </div>
 
       <style>{`
         @keyframes spin {
