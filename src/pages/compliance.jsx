@@ -20,6 +20,13 @@ export default function Compliance() {
   const [querying, setQuerying] = useState(false);
   const [error, setError] = useState(null);
   const chatEndRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -346,11 +353,28 @@ export default function Compliance() {
       </motion.button>
 
       {/* Main Container */}
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] mt-[100px] max-w-full mx-auto overflow-hidden">
+      <div style={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        height: 'calc(100vh - 100px)',
+        marginTop: '100px',
+        maxWidth: '100%',
+        overflow: 'hidden'
+      }}>
 
         {/* Left Panel: Document Vault (30%) */}
         <motion.div
-          className="hidden lg:flex flex-col w-full lg:w-[30%] border-r border-white/10 bg-slate-900/60 backdrop-blur-xl z-20"
+          style={{
+            width: isMobile ? '100%' : '30%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'rgba(15, 23, 42, 0.6)',
+            borderRight: '1px solid rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            overflow: 'hidden',
+            zIndex: 20,
+          }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -602,7 +626,13 @@ export default function Compliance() {
 
         {/* Right Panel: Intelligence Stream (70%) */}
         <motion.div
-          className="flex flex-col w-full lg:w-[70%] bg-transparent overflow-hidden"
+          style={{
+            width: isMobile ? '100%' : '70%',
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'transparent',
+            overflow: 'hidden'
+          }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
