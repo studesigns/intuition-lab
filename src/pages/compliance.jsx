@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader, Trash2 } from 'lucide-react';
+import { FileText, Upload, Send, ArrowLeft, CheckCircle2, AlertTriangle, Loader, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import TechNodes from '../components/TechNodes';
 import ComplianceConfidenceScorecard from '../components/ComplianceConfidenceScorecard';
 import { parseComplianceResponse, formatComplianceAction } from '../utils/complianceParser';
@@ -22,6 +22,7 @@ export default function Compliance() {
   const [error, setError] = useState(null);
   const chatEndRef = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -365,11 +366,13 @@ export default function Compliance() {
         pointerEvents: 'none'
       }}>
 
-        {/* Left Panel: Document Vault (30%) */}
+        {/* Left Panel: Document Vault - Collapsible */}
         <motion.div
           className="compliance-panel"
+          initial={{ opacity: 0, x: -20, width: isMobile ? '100%' : '20%' }}
+          animate={{ opacity: 1, x: 0, width: isPanelCollapsed && !isMobile ? '60px' : isMobile ? '100%' : '20%' }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
           style={{
-            width: isMobile ? '100%' : '30%',
             display: 'flex',
             flexDirection: 'column',
             background: 'transparent',
@@ -380,62 +383,88 @@ export default function Compliance() {
             zIndex: 10,
             position: 'relative',
             pointerEvents: 'auto',
+            marginRight: '1rem',
           }}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          {/* Header */}
+          {/* Header with Collapse Button */}
           <div style={{
-            padding: '2rem 1.5rem',
+            padding: isPanelCollapsed && !isMobile ? '2rem 0.75rem' : '2rem 1.5rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            minHeight: isPanelCollapsed && !isMobile ? '60px' : 'auto',
           }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              marginBottom: '0.5rem',
-            }}>
-              <h2 style={{
-                fontSize: '1.25rem',
-                fontWeight: '700',
-                color: '#ffffff',
-                margin: 0,
-              }}>
-                Active Policies
-              </h2>
+            {!isPanelCollapsed && (
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.25rem 0.75rem',
-                background: 'rgba(34, 197, 94, 0.2)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-                borderRadius: '9999px',
+                gap: '0.75rem',
+                flex: 1,
               }}>
-                <CheckCircle2 size={14} style={{ color: '#22c55e' }} />
-                <span style={{
-                  fontSize: '0.75rem',
-                  color: '#86efac',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
+                <h2 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '700',
+                  color: '#ffffff',
+                  margin: 0,
                 }}>
-                  Ready
-                </span>
+                  Active Policies
+                </h2>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.25rem 0.75rem',
+                  background: 'rgba(34, 197, 94, 0.2)',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  borderRadius: '9999px',
+                }}>
+                  <CheckCircle2 size={14} style={{ color: '#22c55e' }} />
+                  <span style={{
+                    fontSize: '0.75rem',
+                    color: '#86efac',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}>
+                    Ready
+                  </span>
+                </div>
               </div>
-            </div>
-            <p style={{
-              fontSize: '0.875rem',
-              color: '#94a3b8',
-              margin: 0,
-            }}>
-              {policies.length} document{policies.length !== 1 ? 's' : ''} loaded
-            </p>
+            )}
+
+            {/* Collapse/Expand Button */}
+            <motion.button
+              onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
+              style={{
+                padding: '0.5rem',
+                background: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '6px',
+                color: '#cbd5e1',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginLeft: isPanelCollapsed && !isMobile ? 'auto' : '0.5rem',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.borderColor = 'rgba(8, 145, 178, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              title={isPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {isPanelCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </motion.button>
           </div>
 
           {/* Error Banner */}
-          {error && (
+          {error && !isPanelCollapsed && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -462,7 +491,7 @@ export default function Compliance() {
             flex: 1,
             overflowY: 'auto',
             padding: '1rem',
-            display: 'flex',
+            display: isPanelCollapsed && !isMobile ? 'none' : 'flex',
             flexDirection: 'column',
             gap: '0.75rem',
           }}>
@@ -583,6 +612,7 @@ export default function Compliance() {
               cursor: uploading ? 'not-allowed' : 'pointer',
               textAlign: 'center',
               opacity: uploading ? 0.7 : 1,
+              display: isPanelCollapsed && !isMobile ? 'none' : 'block',
             }}
             onDragEnter={!uploading ? handleDrag : undefined}
             onDragLeave={!uploading ? handleDrag : undefined}
@@ -630,11 +660,11 @@ export default function Compliance() {
           `}</style>
         </motion.div>
 
-        {/* Right Panel: Intelligence Stream (70%) */}
+        {/* Right Panel: Intelligence Stream */}
         <motion.div
           className="compliance-panel"
           style={{
-            width: isMobile ? '100%' : '70%',
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
             background: 'transparent',
