@@ -9,11 +9,18 @@ export default function VideoModal({ video, onClose }) {
   useEffect(() => {
     // Reset error when video changes
     setError(null);
+    console.log('VideoModal opened with video:', video?.title);
   }, [video?.id]);
 
-  if (!video) return null;
+  if (!video) {
+    console.log('VideoModal: no video provided');
+    return null;
+  }
+
+  console.log('VideoModal rendering for:', video.title, 'Video object:', video);
 
   if (error) {
+    console.error('VideoModal error state:', error);
     return (
       <div
         style={{
@@ -63,7 +70,8 @@ export default function VideoModal({ video, onClose }) {
     );
   }
 
-  return (
+  try {
+    return (
     <div
       style={{
         position: 'fixed',
@@ -437,5 +445,57 @@ export default function VideoModal({ video, onClose }) {
         </div>
       </div>
     </div>
-  );
+    );
+  } catch (err) {
+    console.error('VideoModal render error:', err);
+    setError(`Rendering error: ${err.message}`);
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          padding: '1rem',
+        }}
+        onClick={onClose}
+      >
+        <div
+          style={{
+            backgroundColor: '#0f172a',
+            border: '1px solid rgba(220, 38, 38, 0.4)',
+            borderRadius: '16px',
+            padding: '2rem',
+            maxWidth: '500px',
+            textAlign: 'center',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 style={{ color: '#ffffff', marginBottom: '1rem' }}>Error Loading Video</h2>
+          <p style={{ color: '#cbd5e1', marginBottom: '0.5rem' }}>{err.message}</p>
+          <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Check the browser console for details.</p>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#0891b2',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '600',
+            }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 }
