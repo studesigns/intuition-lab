@@ -8,23 +8,6 @@
   background-color: transparent !important;
 }
 
-/* Dashboard gradient overlay - visible behind content */
-.compliance-container::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(55, 65, 81, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(31, 41, 55, 0.25) 0%, transparent 50%),
-    radial-gradient(ellipse at 40% 20%, rgba(75, 85, 99, 0.2) 0%, transparent 50%);
-  background-color: transparent;
-  z-index: 0;
-  pointer-events: none;
-}
-
 .compliance-panel {
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(16px);

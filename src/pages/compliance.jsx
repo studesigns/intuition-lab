@@ -307,6 +307,10 @@ export default function Compliance() {
 
   return (
     <>
+      <div className="aurora-container">
+        <div className="aurora-orb-3"></div>
+      </div>
+
       <TechNodes />
 
       {/* Back to Dashboard Button */}
