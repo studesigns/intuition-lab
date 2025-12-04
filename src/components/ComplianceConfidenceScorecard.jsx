@@ -10,6 +10,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 /**
  * Compliance Confidence Scorecard Component
@@ -267,7 +268,18 @@ export default function ComplianceConfidenceScorecard({
                 height: 'auto',  // Dynamic height
                 overflow: 'visible',  // No hidden overflow
               }}>
-                {details}
+                <ReactMarkdown
+                  components={{
+                    h1: ({node, ...props}) => <h1 style={{fontSize: '1.1rem', fontWeight: 'bold', margin: '10px 0', color: '#fff'}} {...props} />,
+                    h2: ({node, ...props}) => <h2 style={{fontSize: '1rem', fontWeight: 'bold', margin: '8px 0', color: '#e2e8f0'}} {...props} />,
+                    h3: ({node, ...props}) => <h3 style={{fontSize: '0.9rem', fontWeight: 'bold', margin: '6px 0', color: '#cbd5e1'}} {...props} />,
+                    strong: ({node, ...props}) => <strong style={{color: '#fff', fontWeight: '700'}} {...props} />,
+                    li: ({node, ...props}) => <li style={{marginLeft: '20px', marginBottom: '4px'}} {...props} />,
+                    p: ({node, ...props}) => <p style={{marginBottom: '10px'}} {...props} />
+                  }}
+                >
+                  {details}
+                </ReactMarkdown>
               </div>
             </motion.div>
           )}
