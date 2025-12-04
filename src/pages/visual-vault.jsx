@@ -30,23 +30,9 @@ export default function VisualVault() {
   const { videos, featuredVideos, loading } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
-  // Debug: log when selectedVideo changes
-  useEffect(() => {
-    console.log('[EFFECT] selectedVideo changed:', selectedVideo?.title || 'null');
-    if (selectedVideo) {
-      console.log('[EFFECT] selectedVideo is NOT null, should render modal');
-      console.log('[EFFECT] selectedVideo object:', selectedVideo);
-    } else {
-      console.log('[EFFECT] selectedVideo is null, modal should be hidden');
-    }
-  }, [selectedVideo]);
-
-  // Wrapper function for debugging with useCallback
+  // Callback to handle video selection
   const handleVideoPlay = useCallback((video) => {
-    console.log('[handleVideoPlay] Called with:', video?.title);
-    console.log('[handleVideoPlay] About to call setSelectedVideo');
     setSelectedVideo(video);
-    console.log('[handleVideoPlay] setSelectedVideo called');
   }, []);
 
   // Group videos by industry

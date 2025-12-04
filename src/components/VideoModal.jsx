@@ -9,18 +9,13 @@ export default function VideoModal({ video, onClose }) {
   useEffect(() => {
     // Reset error when video changes
     setError(null);
-    console.log('VideoModal opened with video:', video?.title);
   }, [video?.id]);
 
   if (!video) {
-    console.log('VideoModal: no video provided');
     return null;
   }
 
-  console.log('VideoModal rendering for:', video.title, 'Video object:', video);
-
   if (error) {
-    console.error('VideoModal error state:', error);
     return (
       <div
         style={{
@@ -82,8 +77,8 @@ export default function VideoModal({ video, onClose }) {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1000,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        zIndex: 9999,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         padding: '1rem',
@@ -144,32 +139,27 @@ export default function VideoModal({ video, onClose }) {
           borderRadius: '12px',
           overflow: 'hidden',
           marginBottom: '2rem',
-          border: '1px solid rgba(8, 145, 178, 0.5)',
-          boxShadow: '0 8px 32px rgba(8, 145, 178, 0.3)',
+          border: '2px solid rgba(8, 145, 178, 0.7)',
+          boxShadow: '0 8px 32px rgba(8, 145, 178, 0.4)',
           position: 'relative',
         }}>
-          <div style={{
-            position: 'relative',
-            width: '100%',
-            paddingBottom: '56.25%',
-            backgroundColor: '#000000',
-          }}>
-            <video
-              ref={videoRef}
-              src={video.cloudinaryUrl}
-              poster={video.thumbnailUrl}
-              controls
-              autoPlay
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                display: 'block',
-              }}
-            />
-          </div>
+          <video
+            key={video.id}
+            controls
+            autoPlay
+            preload="metadata"
+            style={{
+              width: '100%',
+              height: 'auto',
+              display: 'block',
+              backgroundColor: '#000000',
+              maxHeight: '600px',
+            }}
+            poster={video.thumbnailUrl}
+          >
+            <source src={video.cloudinaryUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
         </div>
 
         {/* Metadata Section */}
@@ -461,7 +451,6 @@ export default function VideoModal({ video, onClose }) {
     </div>
     );
   } catch (err) {
-    console.error('VideoModal render error:', err);
     setError(`Rendering error: ${err.message}`);
     return (
       <div

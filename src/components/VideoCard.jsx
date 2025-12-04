@@ -30,17 +30,8 @@ export default function VideoCard({
   }, [isHovered]);
 
   const handleCardClick = () => {
-    try {
-      console.log('VideoCard clicked:', video.title);
-      if (onPlay) {
-        console.log('Calling onPlay with video:', video);
-        const result = onPlay(video);
-        console.log('onPlay returned:', result);
-      } else {
-        console.log('onPlay handler not provided');
-      }
-    } catch (err) {
-      console.error('Error in handleCardClick:', err);
+    if (onPlay) {
+      onPlay(video);
     }
   };
 
