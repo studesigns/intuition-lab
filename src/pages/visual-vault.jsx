@@ -32,6 +32,7 @@ export default function VisualVault() {
 
   // Callback to handle video selection
   const handleVideoPlay = useCallback((video) => {
+    console.log('Opening Theatre Mode for:', video.title);
     setSelectedVideo(video);
   }, []);
 

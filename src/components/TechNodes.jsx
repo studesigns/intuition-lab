@@ -132,6 +132,7 @@ export default function TechNodes() {
         height: '100%',
         zIndex: 0,
         pointerEvents: 'none',
+        userSelect: 'none',
       }}
     >
       <Particles
