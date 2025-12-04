@@ -143,7 +143,7 @@ export default function ComplianceConfidenceScorecard({
         }
       ],
       description: 'This transaction violates federal/local law or explicitly forbidden policies and has been blocked.',
-      confidence: 0
+      confidence: 100
     }
   };
 
@@ -347,37 +347,16 @@ export default function ComplianceConfidenceScorecard({
       }}>
         {config.actions.map((action, idx) => {
           const ActionIcon = action.icon;
-          const [isHovering, setIsHovering] = useState(false);
 
           return (
             <motion.button
               key={idx}
               onClick={() => handleActionClick(action.onClick)}
               disabled={actionInProgress}
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold text-sm text-white transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                padding: '0.75rem 1rem',
                 background: action.color,
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: '600',
-                fontSize: '0.875rem',
-                cursor: actionInProgress ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
-                opacity: actionInProgress ? 0.6 : 1,
-                transform: isHovering && !actionInProgress ? 'translateY(-2px)' : 'translateY(0)',
-                boxShadow: isHovering && !actionInProgress
-                  ? `0 0 20px ${action.color}40`
-                  : 'none',
               }}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              whileHover={!actionInProgress ? { scale: 1.02 } : {}}
-              whileTap={!actionInProgress ? { scale: 0.98 } : {}}
             >
               <ActionIcon size={16} />
               <span>{actionInProgress ? 'Processing...' : action.label}</span>
