@@ -6,6 +6,7 @@ import TechNodes from '../components/TechNodes';
 import ComplianceConfidenceScorecard from '../components/ComplianceConfidenceScorecard';
 import { parseComplianceResponse, formatComplianceAction } from '../utils/complianceParser';
 import '../styles/AuroraBackground.css';
+import '../styles/Compliance.css';
 
 // API Configuration
 const API_URL = 'https://intuition-api.onrender.com';
@@ -354,7 +355,7 @@ export default function Compliance() {
       </motion.button>
 
       {/* Main Container */}
-      <div style={{
+      <div className="compliance-container" style={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         height: 'calc(100vh - 100px)',
@@ -366,6 +367,7 @@ export default function Compliance() {
 
         {/* Left Panel: Document Vault (30%) */}
         <motion.div
+          className="compliance-panel"
           style={{
             width: isMobile ? '100%' : '30%',
             display: 'flex',
@@ -630,6 +632,7 @@ export default function Compliance() {
 
         {/* Right Panel: Intelligence Stream (70%) */}
         <motion.div
+          className="compliance-panel"
           style={{
             width: isMobile ? '100%' : '70%',
             display: 'flex',

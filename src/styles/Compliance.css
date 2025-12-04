@@ -1,0 +1,111 @@
+/* Compliance Engine Styling - Dashboard-inspired */
+
+@keyframes gradient-shift-1 {
+  0% {
+    transform: translate(0%, 0%) scale(1);
+  }
+  33% {
+    transform: translate(30%, -20%) scale(1.1);
+  }
+  66% {
+    transform: translate(-20%, 30%) scale(0.9);
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1);
+  }
+}
+
+@keyframes gradient-shift-2 {
+  0% {
+    transform: translate(0%, 0%) scale(1);
+  }
+  33% {
+    transform: translate(-25%, 25%) scale(0.95);
+  }
+  66% {
+    transform: translate(25%, -15%) scale(1.05);
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1);
+  }
+}
+
+@keyframes gradient-shift-3 {
+  0% {
+    transform: translate(0%, 0%) scale(1);
+  }
+  33% {
+    transform: translate(20%, -30%) scale(1.02);
+  }
+  66% {
+    transform: translate(-30%, 20%) scale(0.98);
+  }
+  100% {
+    transform: translate(0%, 0%) scale(1);
+  }
+}
+
+.compliance-container {
+  min-height: 100vh;
+  display: flex;
+  position: relative;
+  z-index: 10;
+  background-color: transparent !important;
+}
+
+.compliance-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(55, 65, 81, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(31, 41, 55, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 40% 20%, rgba(75, 85, 99, 0.2) 0%, transparent 50%);
+  background-color: transparent;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.compliance-container::after {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 30% 60%, rgba(107, 114, 128, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 70% 30%, rgba(55, 65, 81, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(156, 163, 175, 0.15) 0%, transparent 40%);
+  filter: blur(80px);
+  animation: gradient-shift-1 15s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.compliance-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.compliance-panel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 30px rgba(8, 145, 178, 0.4),
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+  .compliance-container {
+    padding: 2rem 1rem;
+  }
+}
