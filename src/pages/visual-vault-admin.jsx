@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { VideoContext } from '../context/VideoContext';
@@ -7,8 +7,8 @@ import VideoHeader from '../components/VideoHeader';
 import VideoUploadZone from '../components/VideoUploadZone';
 import VideoCard from '../components/VideoCard';
 import VideoModal from '../components/VideoModal';
+import LoginModal from '../components/LoginModal';
 import TechNodes from '../components/TechNodes';
-import { AlertCircle } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -32,96 +32,19 @@ const itemVariants = {
 
 export default function VisualVaultAdmin() {
   const navigate = useNavigate();
-  const { isAdmin } = useContext(VoiceContext);
+  const { isAdmin, setShowLoginModal } = useContext(VoiceContext);
   const { videos, loading, addVideo, deleteVideo, toggleFeatured } = useContext(VideoContext);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Redirect if not admin
-  if (!isAdmin) {
-    return (
-      <>
-        {/* Aurora Background */}
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: -10,
-          background: 'radial-gradient(ellipse at 20% 50%, rgba(8, 145, 178, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%)',
-          pointerEvents: 'none',
-        }} />
-
-        <TechNodes />
-        <VideoHeader />
-
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 10,
-            maxWidth: '1400px',
-            margin: '0 auto',
-            padding: '3rem 2rem',
-            textAlign: 'center',
-          }}
-        >
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '12px',
-            padding: '3rem 2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '1rem',
-          }}>
-            <AlertCircle size={48} color="#fca5a5" />
-            <h1 style={{
-              fontSize: '1.5rem',
-              fontWeight: '700',
-              color: '#fca5a5',
-              margin: 0,
-            }}>
-              Admin Access Required
-            </h1>
-            <p style={{
-              fontSize: '1rem',
-              color: '#cbd5e1',
-              margin: 0,
-              marginBottom: '1rem',
-            }}>
-              Please log in with admin credentials to access the management panel.
-            </p>
-            <button
-              onClick={() => navigate('/')}
-              style={{
-                padding: '0.75rem 1.5rem',
-                background: '#0891b2',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '0.875rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#06b6d4';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#0891b2';
-              }}
-            >
-              Back to Dashboard
-            </button>
-          </div>
-        </div>
-      </>
-    );
-  }
+  // Show login modal if not authenticated
+  useEffect(() => {
+    if (!isAdmin) {
+      setShowLoginModal(true);
+    }
+  }, [isAdmin, setShowLoginModal]);
 
   // Handle video upload
   const handleUploadSuccess = async (videoData) => {
@@ -172,6 +95,9 @@ export default function VisualVaultAdmin() {
 
       {/* Tech Nodes */}
       <TechNodes />
+
+      {/* Login Modal */}
+      <LoginModal />
 
       {/* Header */}
       <VideoHeader />
