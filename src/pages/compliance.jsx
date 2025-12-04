@@ -319,19 +319,19 @@ export default function Compliance() {
         onClick={() => navigate('/')}
         style={{
           position: 'fixed',
-          top: '20px',
+          top: '12px',
           left: '20px',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          padding: '0.75rem 1.5rem',
+          padding: '0.5rem 1.25rem',
           background: 'rgba(30, 41, 59, 0.8)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '8px',
           color: '#cbd5e1',
-          fontSize: '0.875rem',
+          fontSize: '0.8rem',
           fontWeight: '500',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
@@ -359,8 +359,8 @@ export default function Compliance() {
       <div className="compliance-container" style={{
         display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
-        height: 'calc(100vh - 100px)',
-        marginTop: '100px',
+        height: 'calc(100vh - 60px)',
+        marginTop: '60px',
         maxWidth: '100%',
         overflow: 'hidden',
         pointerEvents: 'none'
@@ -371,7 +371,7 @@ export default function Compliance() {
           className="compliance-panel"
           initial={{ opacity: 0, x: -20, width: isMobile ? '100%' : '20%' }}
           animate={{ opacity: 1, x: 0, width: isPanelCollapsed && !isMobile ? '60px' : isMobile ? '100%' : '20%' }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -383,12 +383,12 @@ export default function Compliance() {
             zIndex: 10,
             position: 'relative',
             pointerEvents: 'auto',
-            marginRight: '1rem',
+            marginRight: '0.75rem',
           }}
         >
           {/* Header with Collapse Button */}
           <div style={{
-            padding: isPanelCollapsed && !isMobile ? '2rem 0.75rem' : '2rem 1.5rem',
+            padding: isPanelCollapsed && !isMobile ? '1.25rem 0.75rem' : '1.25rem 1rem',
             borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
             display: 'flex',
             justifyContent: 'space-between',
@@ -403,7 +403,7 @@ export default function Compliance() {
                 flex: 1,
               }}>
                 <h2 style={{
-                  fontSize: '1.25rem',
+                  fontSize: '1.1rem',
                   fontWeight: '700',
                   color: '#ffffff',
                   margin: 0,
@@ -490,10 +490,10 @@ export default function Compliance() {
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '1rem',
+            padding: '0.75rem',
             display: isPanelCollapsed && !isMobile ? 'none' : 'flex',
             flexDirection: 'column',
-            gap: '0.75rem',
+            gap: '0.5rem',
           }}>
             {policies.length === 0 && !uploading && (
               <p style={{
@@ -512,9 +512,9 @@ export default function Compliance() {
                   key={policy.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.4 }}
+                  transition={{ delay: index * 0.04, duration: 0.35 }}
                   style={{
-                    padding: '1rem',
+                    padding: '0.75rem',
                     background: 'rgba(30, 41, 59, 0.4)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '8px',
@@ -603,8 +603,8 @@ export default function Compliance() {
           {/* Upload Drop Zone */}
           <motion.div
             style={{
-              margin: '1rem',
-              padding: '2rem',
+              margin: '0.75rem',
+              padding: '1.25rem',
               border: dragActive ? '2px solid #0891b2' : uploading ? '2px solid rgba(8, 145, 178, 0.5)' : '2px dashed rgba(255, 255, 255, 0.2)',
               borderRadius: '12px',
               background: dragActive ? 'rgba(8, 145, 178, 0.1)' : uploading ? 'rgba(8, 145, 178, 0.05)' : 'transparent',
@@ -624,29 +624,29 @@ export default function Compliance() {
             } : {}}
           >
             {uploading ? (
-              <Loader size={24} style={{
+              <Loader size={20} style={{
                 color: '#0891b2',
-                margin: '0 auto 0.75rem',
+                margin: '0 auto 0.5rem',
                 display: 'block',
                 animation: 'spin 1s linear infinite',
               }} />
             ) : (
-              <Upload size={24} style={{
+              <Upload size={20} style={{
                 color: '#0891b2',
-                margin: '0 auto 0.75rem',
+                margin: '0 auto 0.5rem',
                 display: 'block',
               }} />
             )}
             <p style={{
-              fontSize: '0.875rem',
+              fontSize: '0.8rem',
               color: '#cbd5e1',
-              margin: '0 0 0.25rem 0',
+              margin: '0 0 0.125rem 0',
               fontWeight: '500',
             }}>
               {uploading ? 'Uploading & Indexing...' : 'Drop policies here'}
             </p>
             <p style={{
-              fontSize: '0.75rem',
+              fontSize: '0.7rem',
               color: '#64748b',
               margin: 0,
             }}>
@@ -675,51 +675,51 @@ export default function Compliance() {
           }}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
         >
           {/* Chat Window */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
-            padding: '2rem',
+            padding: '1.25rem',
             display: 'flex',
             flexDirection: 'column',
-            gap: '1.5rem',
+            gap: '1rem',
           }}>
             {conversation.length === 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.7 }}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   height: '100%',
-                  gap: '1.5rem',
+                  gap: '1.25rem',
                 }}
               >
                 <div style={{
-                  padding: '2rem',
+                  padding: '1.5rem',
                   background: 'rgba(8, 145, 178, 0.1)',
                   border: '1px solid rgba(8, 145, 178, 0.2)',
                   borderRadius: '12px',
                   textAlign: 'center',
                 }}>
                   <h3 style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.1rem',
                     fontWeight: '700',
                     color: '#cbd5e1',
-                    margin: '0 0 0.5rem 0',
+                    margin: '0 0 0.375rem 0',
                   }}>
                     Compliance Risk Engine Ready
                   </h3>
                   <p style={{
-                    fontSize: '0.95rem',
+                    fontSize: '0.9rem',
                     color: '#94a3b8',
                     margin: 0,
-                    lineHeight: '1.5',
+                    lineHeight: '1.4',
                   }}>
                     {policies.length === 0
                       ? 'Upload compliance policies from the left panel to begin. Drop PDF files to index them, then ask questions about compliance requirements.'
@@ -734,7 +734,7 @@ export default function Compliance() {
                   key={msg.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  transition={{ delay: index * 0.06, duration: 0.35 }}
                   style={{
                     display: 'flex',
                     justifyContent: msg.type === 'user' ? 'flex-end' : 'flex-start',
@@ -749,13 +749,13 @@ export default function Compliance() {
                     {msg.type === 'user' && (
                       <>
                         <div style={{
-                          padding: '1rem 1.5rem',
+                          padding: '0.75rem 1.25rem',
                           background: 'rgba(8, 145, 178, 0.2)',
                           border: '1px solid rgba(8, 145, 178, 0.3)',
                           borderRadius: '12px',
                           color: '#e2e8f0',
-                          fontSize: '0.95rem',
-                          lineHeight: '1.5',
+                          fontSize: '0.9rem',
+                          lineHeight: '1.4',
                         }}>
                           {msg.message}
                         </div>
@@ -792,13 +792,13 @@ export default function Compliance() {
 
                     {msg.type === 'system' && (
                       <div style={{
-                        padding: '0.875rem 1rem',
+                        padding: '0.7rem 0.9rem',
                         background: 'rgba(8, 145, 178, 0.1)',
                         border: '1px solid rgba(8, 145, 178, 0.2)',
                         borderRadius: '8px',
                         color: '#cbd5e1',
-                        fontSize: '0.875rem',
-                        lineHeight: '1.5',
+                        fontSize: '0.8rem',
+                        lineHeight: '1.4',
                       }}>
                         <p style={{ margin: '0 0 0.25rem 0' }}>
                           ✓ {msg.message}
@@ -821,13 +821,13 @@ export default function Compliance() {
 
           {/* Input Bar */}
           <div style={{
-            padding: '2rem',
+            padding: '1rem 1.25rem',
             background: 'rgba(15, 23, 42, 0.3)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
             display: 'flex',
-            gap: '1rem',
+            gap: '0.75rem',
             alignItems: 'flex-end',
           }}>
             <input
@@ -838,12 +838,12 @@ export default function Compliance() {
               placeholder="Ask about compliance policies..."
               style={{
                 flex: 1,
-                padding: '0.875rem 1.25rem',
+                padding: '0.7rem 1rem',
                 background: 'rgba(30, 41, 59, 0.6)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '8px',
                 color: '#e2e8f0',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 outline: 'none',
                 transition: 'all 0.3s ease',
               }}
@@ -861,14 +861,14 @@ export default function Compliance() {
               onClick={handleSendMessage}
               disabled={!inputValue.trim()}
               style={{
-                padding: '0.875rem 1.5rem',
+                padding: '0.7rem 1.25rem',
                 background: '#0891b2',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',
                 fontWeight: '600',
                 cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
-                fontSize: '0.95rem',
+                fontSize: '0.9rem',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
