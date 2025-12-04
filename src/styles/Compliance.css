@@ -4,10 +4,11 @@
   min-height: 100vh;
   display: flex;
   position: relative;
+  z-index: 10;
   background-color: transparent !important;
 }
 
-/* Overlay gradient - positioned behind aurora orbs */
+/* Dashboard gradient overlay - visible behind content */
 .compliance-container::before {
   content: '';
   position: fixed;
@@ -20,7 +21,7 @@
     radial-gradient(ellipse at 80% 80%, rgba(31, 41, 55, 0.25) 0%, transparent 50%),
     radial-gradient(ellipse at 40% 20%, rgba(75, 85, 99, 0.2) 0%, transparent 50%);
   background-color: transparent;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
 }
 
