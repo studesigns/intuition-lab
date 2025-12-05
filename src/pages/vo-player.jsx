@@ -114,6 +114,27 @@ function Library() {
     setShowAddModal(true);
   };
 
+  // Handle toggle featured - Only ONE voice can be featured at a time
+  const handleToggleFeature = async (voiceId) => {
+    // Find the clicked voice and determine new featured status
+    const clickedVoice = voices.find(v => v.id === voiceId);
+    if (!clickedVoice) return;
+
+    const newFeaturedStatus = !clickedVoice.isFeatured;
+
+    // Update Firebase for the clicked voice
+    await toggleFeatured(voiceId, clickedVoice.isFeatured);
+
+    // If setting this voice to featured, unfeature all others
+    if (newFeaturedStatus) {
+      for (const voice of voices) {
+        if (voice.id !== voiceId && voice.isFeatured) {
+          await toggleFeatured(voice.id, true);
+        }
+      }
+    }
+  };
+
   // Group voices by category (tag) and filter by active category
   const voicesByCategory = () => {
     const grouped = {};
@@ -150,8 +171,8 @@ function Library() {
   // Get all unique categories for the pill buttons
   const allCategories = Object.keys(allVoiceGroups);
 
-  // Get featured voice (first one or random)
-  const featuredVoice = voices.length > 0 ? voices[0] : null;
+  // Get featured voice - find voice marked as isFeatured: true, fallback to first voice
+  const featuredVoice = voices.find(v => v.isFeatured === true) || (voices.length > 0 ? voices[0] : null);
 
   return (
     <div style={{
@@ -579,6 +600,8 @@ function Library() {
                         isPlaying={playingVoiceId === voice.id}
                         onTogglePlay={handleTogglePlay}
                         onEdit={handleEditVoice}
+                        onToggleFeature={handleToggleFeature}
+                        onDelete={deleteVoice}
                       />
                     ))}
                   </div>

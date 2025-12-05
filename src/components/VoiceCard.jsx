@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, Edit2, Trash2 } from 'lucide-react';
+import { Play, Pause, Pencil, Trash2, Star } from 'lucide-react';
 import { VoiceContext, LANGUAGES, SOURCES } from '../context/VoiceContext';
 
 // Helper function to get SVG flag by country code
@@ -37,10 +37,9 @@ const getSourceColor = (sourceId) => {
   }
 };
 
-export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
+export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onToggleFeature, onDelete }) {
   const { isAdmin, deleteVoice } = useContext(VoiceContext);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showAdminButtons, setShowAdminButtons] = useState(false);
 
   return (
     <motion.div
@@ -58,8 +57,6 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
         y: -4,
         borderColor: 'rgba(6, 182, 212, 0.5)',
       }}
-      onMouseEnter={() => setShowAdminButtons(true)}
-      onMouseLeave={() => setShowAdminButtons(false)}
     >
       {/* Background Gradient */}
       <div
@@ -303,14 +300,65 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
         </p>
       </div>
 
-      {/* Admin Buttons - Hover Overlay */}
-      {showAdminButtons && isAdmin && (
+      {/* Top Right: Feature Toggle Star Button */}
+      {isAdmin && (
         <div
           style={{
             position: 'absolute',
-            top: '8px',
-            right: '8px',
-            zIndex: 4,
+            top: '1rem',
+            right: '1rem',
+            zIndex: 10,
+          }}
+        >
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFeature && onToggleFeature(voice.id);
+            }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(15, 23, 42, 0.6)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              padding: 0,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(6, 182, 212, 0.3)';
+              e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(15, 23, 42, 0.6)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            }}
+            title={voice.isFeatured ? 'Remove from Featured' : 'Mark as Featured'}
+          >
+            <Star
+              size={18}
+              color={voice.isFeatured ? '#facc15' : '#94a3b8'}
+              fill={voice.isFeatured ? '#facc15' : 'none'}
+            />
+          </motion.button>
+        </div>
+      )}
+
+      {/* Bottom Right: Edit & Delete Buttons */}
+      {isAdmin && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '1rem',
+            right: '1rem',
+            zIndex: 10,
             display: 'flex',
             gap: '0.5rem',
           }}
@@ -319,29 +367,32 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
           <motion.button
             onClick={(e) => {
               e.stopPropagation();
-              onEdit(voice);
+              onEdit && onEdit(voice);
             }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
             style={{
-              width: '32px',
-              height: '32px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
-              background: 'rgba(8, 145, 178, 0.8)',
+              background: '#0891b2',
               border: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
+              padding: 0,
             }}
-            whileHover={{ scale: 1.1 }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#0e7490';
+              e.currentTarget.style.background = '#06b6d4';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(8, 145, 178, 0.8)';
+              e.currentTarget.style.background = '#0891b2';
             }}
+            title="Edit voice"
           >
-            <Edit2 size={16} color="#ffffff" />
+            <Pencil size={16} color="#ffffff" />
           </motion.button>
 
           {/* Delete Button */}
@@ -350,25 +401,28 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
               e.stopPropagation();
               setShowDeleteModal(true);
             }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
             style={{
-              width: '32px',
-              height: '32px',
+              width: '36px',
+              height: '36px',
               borderRadius: '50%',
-              background: 'rgba(239, 68, 68, 0.8)',
+              background: '#dc2626',
               border: 'none',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               transition: 'all 0.3s ease',
+              padding: 0,
             }}
-            whileHover={{ scale: 1.1 }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#dc2626';
+              e.currentTarget.style.background = '#ef4444';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.8)';
+              e.currentTarget.style.background = '#dc2626';
             }}
+            title="Delete voice"
           >
             <Trash2 size={16} color="#ffffff" />
           </motion.button>
@@ -437,7 +491,11 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
               </button>
               <button
                 onClick={() => {
-                  deleteVoice(voice.id);
+                  if (onDelete) {
+                    onDelete(voice.id);
+                  } else {
+                    deleteVoice(voice.id);
+                  }
                   setShowDeleteModal(false);
                 }}
                 style={{
