@@ -139,7 +139,7 @@ function Library() {
         zIndex: 10,
         paddingTop: '80px',
       }}>
-        {/* Hero Section - Featured Voice */}
+        {/* Hero Section - Featured Voice (Compact Banner) */}
         {featuredVoice && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -148,12 +148,15 @@ function Library() {
             style={{
               position: 'relative',
               width: '100%',
-              minHeight: '28vh',
+              minHeight: '200px',
               overflow: 'hidden',
-              marginBottom: '2rem',
+              marginBottom: '1.5rem',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.15) 0%, rgba(14, 116, 144, 0.1) 100%)',
+              border: '1px solid rgba(8, 145, 178, 0.3)',
             }}
           >
-            {/* Hero Background - Sound Wave Gradient */}
+            {/* Hero Background Gradient */}
             <div
               style={{
                 position: 'absolute',
@@ -161,42 +164,12 @@ function Library() {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.3) 0%, rgba(14, 116, 144, 0.2) 50%, rgba(6, 78, 87, 0.1) 100%)',
+                background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.2) 0%, rgba(14, 116, 144, 0.1) 100%)',
                 zIndex: 0,
               }}
             />
 
-            {/* Sound Wave Animation Background */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '300px',
-                height: '300px',
-                background: 'radial-gradient(circle, rgba(34, 211, 238, 0.2) 0%, transparent 70%)',
-                borderRadius: '50%',
-                zIndex: 1,
-              }}
-            />
-
-            {/* Microphone Icon Area */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                fontSize: '120px',
-                zIndex: 2,
-                opacity: 0.3,
-              }}
-            >
-              🎙️
-            </div>
-
-            {/* Dark Overlay Gradient */}
+            {/* Dark Overlay */}
             <div
               style={{
                 position: 'absolute',
@@ -204,8 +177,8 @@ function Library() {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%), linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)',
-                zIndex: 2,
+                background: 'linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent)',
+                zIndex: 1,
               }}
             />
 
@@ -213,12 +186,12 @@ function Library() {
             <div
               style={{
                 position: 'relative',
-                zIndex: 3,
+                zIndex: 2,
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '2rem 3rem 1.5rem 3rem',
+                justifyContent: 'center',
+                padding: '2rem 3rem',
                 maxWidth: '900px',
               }}
             >
@@ -226,29 +199,29 @@ function Library() {
               <span
                 style={{
                   display: 'inline-block',
-                  background: 'rgba(8, 145, 178, 0.9)',
+                  background: 'rgba(8, 145, 178, 0.8)',
                   color: '#ffffff',
-                  padding: '0.35rem 0.75rem',
+                  padding: '0.25rem 0.65rem',
                   borderRadius: '9999px',
-                  fontSize: '0.75rem',
+                  fontSize: '0.65rem',
                   fontWeight: '700',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  marginBottom: '1.5rem',
+                  marginBottom: '0.75rem',
                   width: 'fit-content',
                 }}
               >
-                Featured Voice of the Month
+                Featured Voice
               </span>
 
               {/* Voice Name */}
               <h1
                 style={{
-                  fontSize: '3.5rem',
+                  fontSize: '2rem',
                   fontWeight: 'bold',
                   color: '#ffffff',
                   margin: '0 0 0.5rem 0',
-                  letterSpacing: '-1px',
+                  letterSpacing: '-0.5px',
                 }}
               >
                 {featuredVoice.name}
@@ -257,73 +230,15 @@ function Library() {
               {/* Category + Details */}
               <p
                 style={{
-                  fontSize: '1.5rem',
+                  fontSize: '0.95rem',
                   color: '#22d3ee',
-                  margin: '0 0 1.5rem 0',
+                  margin: '0',
                   fontWeight: '500',
                 }}
               >
                 {featuredVoice.category} • {featuredVoice.accent} • {featuredVoice.language}
               </p>
-
-              {/* Description */}
-              {featuredVoice.description && (
-                <p
-                  style={{
-                    fontSize: '1.125rem',
-                    color: '#cbd5e1',
-                    margin: '0 0 2rem 0',
-                    lineHeight: '1.6',
-                    maxWidth: '600px',
-                  }}
-                >
-                  {featuredVoice.description}
-                </p>
-              )}
-
-              {/* Action Buttons */}
-              <div style={{
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'center',
-              }}>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleTogglePlay(featuredVoice)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '1rem 2.5rem',
-                    background: '#ffffff',
-                    color: '#000000',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                >
-                  🎵 Listen to Demo
-                </motion.button>
-              </div>
             </div>
-
-            {/* Fade to Black at Bottom */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                width: '100%',
-                height: '200px',
-                background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9))',
-                zIndex: 1,
-                pointerEvents: 'none',
-              }}
-            />
           </motion.div>
         )}
 

@@ -47,16 +47,17 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
       style={{
         position: 'relative',
         aspectRatio: '1 / 1',
-        background: 'rgba(30, 41, 59, 0.3)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '12px',
+        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        border: '1px solid rgba(71, 85, 105, 0.5)',
+        borderRadius: '16px',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
       }}
-      whileHover={{ scale: 1.05, y: -10 }}
+      whileHover={{
+        y: -4,
+        borderColor: 'rgba(6, 182, 212, 0.5)',
+      }}
       onMouseEnter={() => setShowAdminButtons(true)}
       onMouseLeave={() => setShowAdminButtons(false)}
     >
@@ -177,64 +178,85 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
         )}
       </div>
 
-      {/* Metadata Section - Bottom */}
+      {/* Top Left: Category Badge */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '1rem',
+          left: '1rem',
+          zIndex: 5,
+        }}
+      >
+        <span
+          style={{
+            display: 'inline-block',
+            fontSize: '0.7rem',
+            fontWeight: '600',
+            padding: '0.35rem 0.75rem',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {voice.category}
+        </span>
+      </div>
+
+      {/* Top Right: Source Badge */}
+      {voice.source && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '1rem',
+            zIndex: 5,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              fontSize: '0.7rem',
+              fontWeight: '600',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '9999px',
+              backgroundColor: 'rgba(15, 23, 42, 0.6)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {SOURCES.find(s => s.id === voice.source)?.name.split(' ')[0]}
+          </span>
+        </div>
+      )}
+
+      {/* Metadata Section - Bottom (Simplified) */}
       <div
         style={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.6), transparent)',
-          padding: '1.5rem 1rem 1rem 1rem',
+          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4), transparent)',
+          padding: '2rem 1rem 1.25rem 1rem',
           zIndex: 3,
-          minHeight: '110px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
           gap: '0.5rem',
         }}
       >
-        {/* Category & Source Badges */}
-        <div style={{
-          display: 'flex',
-          gap: '0.5rem',
-          flexWrap: 'wrap',
-          marginBottom: '0.25rem',
-        }}>
-          {/* Category Badge */}
-          <span style={{
-            display: 'inline-block',
-            fontSize: '0.65rem',
-            fontWeight: '600',
-            padding: '0.25rem 0.6rem',
-            borderRadius: '4px',
-            backgroundColor: 'rgba(8, 145, 178, 0.6)',
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
-            {voice.category}
-          </span>
-
-          {/* Source Badge */}
-          {voice.source && (
-            <span style={{
-              display: 'inline-block',
-              fontSize: '0.65rem',
-              fontWeight: '600',
-              padding: '0.25rem 0.6rem',
-              borderRadius: '4px',
-              backgroundColor: getSourceColor(voice.source).bg,
-              color: getSourceColor(voice.source).text,
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-            }}>
-              {SOURCES.find(s => s.id === voice.source)?.name.split(' ')[0]}
-            </span>
-          )}
-        </div>
-
-        {/* Voice Name */}
+        {/* Voice Name - Bold & White */}
         <h3
           style={{
             fontSize: '1rem',
@@ -249,11 +271,11 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
           {voice.name}
         </h3>
 
-        {/* Flag + Language + Accent Details */}
+        {/* Flag + Language + Accent - Grey Secondary Text */}
         <p
           style={{
             fontSize: '0.75rem',
-            color: '#cbd5e1',
+            color: '#94a3b8',
             margin: '0',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -261,7 +283,7 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
             letterSpacing: '0.5px',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.25rem',
+            gap: '0.3rem',
           }}
         >
           {(() => {
