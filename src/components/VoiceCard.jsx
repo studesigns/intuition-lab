@@ -1,16 +1,40 @@
 import { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, Edit2, Trash2 } from 'lucide-react';
-import { VoiceContext, LANGUAGES } from '../context/VoiceContext';
+import { VoiceContext, LANGUAGES, SOURCES } from '../context/VoiceContext';
 
-// Helper function to convert country code to flag emoji
-const getCountryFlagEmoji = (countryCode) => {
-  if (!countryCode) return '';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
+// Helper function to get SVG flag by country code
+const FlagSVG = ({ countryCode }) => {
+  if (!countryCode) return null;
+
+  // Map of country codes to flag
+  const flags = {
+    'us': '🇺🇸', 'gb': '🇬🇧', 'jp': '🇯🇵', 'cn': '🇨🇳', 'de': '🇩🇪',
+    'in': '🇮🇳', 'fr': '🇫🇷', 'kr': '🇰🇷', 'pt': '🇵🇹', 'it': '🇮🇹',
+    'es': '🇪🇸', 'id': '🇮🇩', 'nl': '🇳🇱', 'tr': '🇹🇷', 'ph': '🇵🇭',
+    'pl': '🇵🇱', 'se': '🇸🇪', 'bg': '🇧🇬', 'ro': '🇷🇴', 'sa': '🇸🇦',
+    'cz': '🇨🇿', 'gr': '🇬🇷', 'fi': '🇫🇮', 'hr': '🇭🇷', 'my': '🇲🇾',
+    'sk': '🇸🇰', 'dk': '🇩🇰', 'ua': '🇺🇦', 'ru': '🇷🇺',
+  };
+
+  return <span>{flags[countryCode.toLowerCase()] || '🌍'}</span>;
+};
+
+// Helper function to get source color
+const getSourceColor = (sourceId) => {
+  const source = SOURCES.find(s => s.id === sourceId);
+  if (!source) return { bg: 'bg-gray-500', text: 'text-gray-100' };
+
+  switch(sourceId) {
+    case 'wellsaid':
+      return { bg: 'bg-indigo-600', text: 'text-indigo-100' };
+    case 'elevenlabs':
+      return { bg: 'bg-emerald-600', text: 'text-emerald-100' };
+    case 'synthesia':
+      return { bg: 'bg-amber-600', text: 'text-amber-100' };
+    default:
+      return { bg: 'bg-gray-600', text: 'text-gray-100' };
+  }
 };
 
 export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
@@ -160,15 +184,56 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
           bottom: 0,
           left: 0,
           right: 0,
-          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent)',
+          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.6), transparent)',
           padding: '1.5rem 1rem 1rem 1rem',
           zIndex: 3,
-          minHeight: '100px',
+          minHeight: '110px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
+          gap: '0.5rem',
         }}
       >
+        {/* Category & Source Badges */}
+        <div style={{
+          display: 'flex',
+          gap: '0.5rem',
+          flexWrap: 'wrap',
+          marginBottom: '0.25rem',
+        }}>
+          {/* Category Badge */}
+          <span style={{
+            display: 'inline-block',
+            fontSize: '0.65rem',
+            fontWeight: '600',
+            padding: '0.25rem 0.6rem',
+            borderRadius: '4px',
+            backgroundColor: 'rgba(8, 145, 178, 0.6)',
+            color: '#ffffff',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            {voice.category}
+          </span>
+
+          {/* Source Badge */}
+          {voice.source && (
+            <span style={{
+              display: 'inline-block',
+              fontSize: '0.65rem',
+              fontWeight: '600',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '4px',
+              backgroundColor: getSourceColor(voice.source).bg,
+              color: getSourceColor(voice.source).text,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}>
+              {SOURCES.find(s => s.id === voice.source)?.name.split(' ')[0]}
+            </span>
+          )}
+        </div>
+
         {/* Voice Name */}
         <h3
           style={{
@@ -188,12 +253,15 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
         <p
           style={{
             fontSize: '0.75rem',
-            color: '#9ca3af',
+            color: '#cbd5e1',
             margin: '0',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             letterSpacing: '0.5px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.25rem',
           }}
         >
           {(() => {
@@ -202,9 +270,13 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit }) {
               l => l.name.toLowerCase() === voice.language.toLowerCase()
             );
             const countryCode = langEntry?.countryCode || '';
-            const flagEmoji = getCountryFlagEmoji(countryCode);
 
-            return `${flagEmoji} ${voice.language} • ${voice.accent}`;
+            return (
+              <>
+                <FlagSVG countryCode={countryCode} />
+                <span>{voice.language} • {voice.accent}</span>
+              </>
+            );
           })()}
         </p>
       </div>

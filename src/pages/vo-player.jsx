@@ -148,9 +148,9 @@ function Library() {
             style={{
               position: 'relative',
               width: '100%',
-              minHeight: '50vh',
+              minHeight: '28vh',
               overflow: 'hidden',
-              marginBottom: '4rem',
+              marginBottom: '2rem',
             }}
           >
             {/* Hero Background - Sound Wave Gradient */}
@@ -218,7 +218,7 @@ function Library() {
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
-                padding: '4rem 3rem',
+                padding: '2rem 3rem 1.5rem 3rem',
                 maxWidth: '900px',
               }}
             >
@@ -665,6 +665,15 @@ function Library() {
             onClose={() => {
               setShowAddModal(false);
               setEditingVoice(null);
+            }}
+            onSave={(savedVoice) => {
+              // Optional: Handle save callback for immediate UI updates
+              // The real-time Firestore listener will handle the bulk of the update
+              if (editingVoice) {
+                console.log('Voice updated:', savedVoice);
+              } else {
+                console.log('Voice added:', savedVoice);
+              }
             }}
           />
         )}

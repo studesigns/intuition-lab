@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { VoiceContext, CATEGORIES, SOURCES, LANGUAGES, ACCENTS } from '../context/VoiceContext';
 
-export default function VoiceModal({ onClose, voice = null }) {
+export default function VoiceModal({ onClose, voice = null, onSave = null }) {
   const { addVoice, updateVoice } = useContext(VoiceContext);
   const isEditing = !!voice;
 
@@ -39,8 +39,16 @@ export default function VoiceModal({ onClose, voice = null }) {
 
       if (isEditing) {
         await updateVoice(voice.id, voiceData);
+        // Notify parent of successful update
+        if (onSave) {
+          onSave({ id: voice.id, ...voiceData });
+        }
       } else {
         await addVoice(voiceData);
+        // Notify parent of successful add (Firebase will generate the ID)
+        if (onSave) {
+          onSave(voiceData);
+        }
       }
       onClose();
     } catch (err) {
