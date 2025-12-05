@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { VoiceContext } from '../context/VoiceContext';
 import { Mic, User, LogOut, Settings, Search } from 'lucide-react';
 import SignOutConfirmationModal from './SignOutConfirmationModal';
+import AdminAvatar from './AdminAvatar';
 
 export default function Header({ searchQuery, setSearchQuery }) {
   const navigate = useNavigate();
@@ -241,32 +242,16 @@ export default function Header({ searchQuery, setSearchQuery }) {
               flexShrink: 0,
             }}
           >
-            {/* Avatar Button */}
-            <button
+            {/* Avatar Button - Premium Styled */}
+            <div
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-                background: 'linear-gradient(135deg, #0891b2 0%, #0e7490 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
-                e.currentTarget.style.boxShadow = '0 0 15px rgba(8, 145, 178, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
             >
-              <User size={20} color="white" />
-            </button>
+              <AdminAvatar name="Admin User" />
+            </div>
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
