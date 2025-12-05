@@ -311,7 +311,7 @@ function Library() {
                 pointerEvents: 'none',
               }}
             >
-              <Mic size={240} strokeWidth={1.5} color="#ffffff" />
+              <Mic size={160} strokeWidth={1.5} color="#ffffff" />
             </div>
 
             {/* Left Section: Play Button + Info */}
