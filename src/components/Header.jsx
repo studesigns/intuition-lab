@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { VoiceContext } from '../context/VoiceContext';
-import { Mic, User, LogOut, Settings, Search } from 'lucide-react';
+import { Mic, User, LogOut, Settings, Search, X } from 'lucide-react';
 import SignOutConfirmationModal from './SignOutConfirmationModal';
 import AdminAvatar from './AdminAvatar';
 
@@ -197,7 +197,7 @@ export default function Header({ searchQuery, setSearchQuery }) {
             <input
               type="text"
               placeholder="Search voices..."
-              value={searchQuery}
+              value={searchQuery || ''}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: '100%',
@@ -205,7 +205,7 @@ export default function Header({ searchQuery, setSearchQuery }) {
                 border: '1px solid rgba(255, 255, 255, 0.2)',
                 borderRadius: '9999px',
                 paddingLeft: '2.5rem',
-                paddingRight: '1rem',
+                paddingRight: searchQuery ? '2.5rem' : '1rem',
                 paddingTop: '0.625rem',
                 paddingBottom: '0.625rem',
                 fontSize: '0.875rem',
@@ -217,13 +217,43 @@ export default function Header({ searchQuery, setSearchQuery }) {
               }}
               onFocus={(e) => {
                 e.target.style.background = 'rgba(0, 0, 0, 0.4)';
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                e.target.style.borderColor = 'rgba(6, 182, 212, 0.6)';
               }}
               onBlur={(e) => {
                 e.target.style.background = 'rgba(255, 255, 255, 0.1)';
                 e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
               }}
             />
+
+            {/* Clear Button (X icon) - Only shows when searching */}
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#9ca3af',
+                  padding: '0.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#9ca3af';
+                }}
+                title="Clear search"
+              >
+                <X size={16} />
+              </button>
+            )}
+
             <style>{`
               input::placeholder {
                 color: #9ca3af;

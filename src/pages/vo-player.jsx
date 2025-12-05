@@ -144,6 +144,7 @@ function Library() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [showTableView, setShowTableView] = useState(false);
   const [deleteConfirmVoice, setDeleteConfirmVoice] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const categoryRefs = useRef({});
   const audioRef = useRef(new Audio());
 
@@ -205,10 +206,29 @@ function Library() {
     }
   };
 
-  // Group voices by category (tag) and filter by active category
+  // Apply search AND category filtering
+  const applyFilters = (voicesToFilter) => {
+    return voicesToFilter.filter((voice) => {
+      // Category match
+      const matchesCategory = activeCategory === 'All' || voice.category === activeCategory;
+
+      // Search match (Name, Accent, or Category)
+      const query = searchQuery.toLowerCase();
+      const matchesSearch =
+        !searchQuery ||
+        voice.name.toLowerCase().includes(query) ||
+        voice.accent.toLowerCase().includes(query) ||
+        voice.category.toLowerCase().includes(query);
+
+      return matchesCategory && matchesSearch;
+    });
+  };
+
+  // Group voices by category (tag) and filter by search
   const voicesByCategory = () => {
+    const filtered = applyFilters(voices);
     const grouped = {};
-    voices.forEach(voice => {
+    filtered.forEach(voice => {
       const category = voice.category || 'Other';
       if (!grouped[category]) {
         grouped[category] = [];
@@ -220,8 +240,8 @@ function Library() {
 
   const allVoiceGroups = voicesByCategory();
 
-  // For table view - all voices
-  const filteredVoices = voices;
+  // For table view - all voices with filters applied
+  const filteredVoices = applyFilters(voices);
 
   // Filter based on active category
   let voiceGroups = {};
@@ -238,8 +258,18 @@ function Library() {
     }
   }
 
-  // Get all unique categories for the pill buttons
-  const allCategories = Object.keys(allVoiceGroups);
+  // Get all unique categories for the pill buttons (from unfiltered voices)
+  const allCategories = (() => {
+    const unfiltered = {};
+    voices.forEach(voice => {
+      const category = voice.category || 'Other';
+      if (!unfiltered[category]) {
+        unfiltered[category] = [];
+      }
+      unfiltered[category].push(voice);
+    });
+    return Object.keys(unfiltered);
+  })();
 
   // Get featured voice - find voice marked as isFeatured: true, fallback to first voice
   const featuredVoice = voices.find(v => v.isFeatured === true) || (voices.length > 0 ? voices[0] : null);
@@ -253,7 +283,7 @@ function Library() {
       background: 'transparent !important',
     }}>
       {/* Header */}
-      <Header />
+      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
       {/* Login Modal */}
       <LoginModal />
@@ -682,8 +712,69 @@ function Library() {
             </motion.div>
           )}
 
+          {/* Empty State - No search results */}
+          {!loading && searchQuery && filteredVoices.length === 0 && (
+            <div style={{
+              textAlign: 'center',
+              paddingTop: '5rem',
+              paddingBottom: '5rem',
+            }}>
+              <div style={{
+                width: '4rem',
+                height: '4rem',
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem',
+              }}>
+                <span style={{ fontSize: '1.75rem' }}>🔍</span>
+              </div>
+              <h3 style={{
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#ffffff',
+                marginBottom: '0.5rem',
+              }}>
+                No voices found for "{searchQuery}"
+              </h3>
+              <p style={{
+                color: '#9ca3af',
+                fontSize: '0.875rem',
+                marginBottom: '1.5rem',
+              }}>
+                Try adjusting your search terms or browse by category.
+              </p>
+              <button
+                onClick={() => setSearchQuery('')}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'rgba(6, 182, 212, 0.2)',
+                  border: '1px solid rgba(6, 182, 212, 0.4)',
+                  borderRadius: '6px',
+                  color: '#22d3ee',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(6, 182, 212, 0.3)';
+                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(6, 182, 212, 0.2)';
+                  e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.4)';
+                }}
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+
           {/* Empty State - No voices in selected category */}
-          {!loading && activeCategory !== 'All' && categories.length === 0 && (
+          {!loading && !searchQuery && activeCategory !== 'All' && categories.length === 0 && (
             <div style={{
               textAlign: 'center',
               paddingTop: '5rem',
