@@ -175,15 +175,20 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
         )}
       </div>
 
-      {/* Top Left: Category Badge */}
+      {/* Top Left: Badges Container (Category + Source) */}
       <div
         style={{
           position: 'absolute',
           top: '1rem',
           left: '1rem',
-          zIndex: 5,
+          zIndex: 10,
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          maxWidth: '200px',
         }}
       >
+        {/* Category Badge */}
         <span
           style={{
             display: 'inline-block',
@@ -203,18 +208,9 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
         >
           {voice.category}
         </span>
-      </div>
 
-      {/* Top Right: Source Badge */}
-      {voice.source && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 5,
-          }}
-        >
+        {/* Source Badge */}
+        {voice.source && (
           <span
             style={{
               display: 'inline-block',
@@ -234,8 +230,8 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
           >
             {SOURCES.find(s => s.id === voice.source)?.name.split(' ')[0]}
           </span>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Metadata Section - Bottom (Simplified) */}
       <div
@@ -318,11 +314,11 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
             style={{
-              width: '36px',
-              height: '36px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
-              background: 'rgba(15, 23, 42, 0.6)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(15, 23, 42, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
               display: 'flex',
@@ -331,14 +327,17 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
               cursor: 'pointer',
               transition: 'all 0.3s ease',
               padding: 0,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(6, 182, 212, 0.3)';
-              e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.5)';
+              e.currentTarget.style.background = 'rgba(6, 182, 212, 0.4)';
+              e.currentTarget.style.borderColor = 'rgba(6, 182, 212, 0.6)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(6, 182, 212, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(15, 23, 42, 0.6)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.background = 'rgba(15, 23, 42, 0.8)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
             }}
             title={voice.isFeatured ? 'Remove from Featured' : 'Mark as Featured'}
           >

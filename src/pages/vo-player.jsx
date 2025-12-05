@@ -307,11 +307,11 @@ function Library() {
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 zIndex: 0,
-                opacity: 0.05,
+                opacity: 0.03,
                 pointerEvents: 'none',
               }}
             >
-              <Mic size={384} strokeWidth={1} color="#ffffff" />
+              <Mic size={240} strokeWidth={1.5} color="#ffffff" />
             </div>
 
             {/* Left Section: Play Button + Info */}
