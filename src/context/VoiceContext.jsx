@@ -215,7 +215,7 @@ export function VoiceProvider({ children }) {
   // Toggle featured status
   const toggleFeatured = async (id, currentValue) => {
     await updateDoc(doc(db, 'voices', id), {
-      featured: !currentValue
+      isFeatured: !currentValue
     });
   };
 
