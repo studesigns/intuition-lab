@@ -181,11 +181,11 @@ export default function VoiceCard({ voice, isPlaying, onTogglePlay, onEdit, onTo
           position: 'absolute',
           top: '1rem',
           left: '1rem',
+          right: '60px',
           zIndex: 10,
           display: 'flex',
           flexWrap: 'wrap',
           gap: '0.5rem',
-          maxWidth: '200px',
         }}
       >
         {/* Category Badge */}
