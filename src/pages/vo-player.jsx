@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Play, Pause } from 'lucide-react';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceProvider, VoiceContext, CATEGORIES } from '../context/VoiceContext';
@@ -9,6 +9,40 @@ import VoiceModal from '../components/VoiceModal';
 import LoginModal from '../components/LoginModal';
 import Header from '../components/Header';
 import '../styles/AuroraBackground.css';
+
+// Waveform Component - Animated Visualizer
+const Waveform = ({ isPlaying }) => {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.35rem',
+      height: '32px',
+    }}>
+      {[...Array(8)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            width: '3px',
+            background: '#06b6d4',
+            borderRadius: '999px',
+            transition: 'all 0.3s ease',
+            height: isPlaying ? `${Math.random() * 100}%` : '4px',
+            minHeight: '4px',
+            animation: isPlaying ? `wave 0.6s ease-in-out infinite` : 'none',
+            animationDelay: `${i * 0.1}s`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes wave {
+          0%, 100% { height: 4px; opacity: 0.6; }
+          50% { height: 24px; opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
 
 // Animation variants
 const containerVariants = {
@@ -139,106 +173,156 @@ function Library() {
         zIndex: 10,
         paddingTop: '80px',
       }}>
-        {/* Hero Section - Featured Voice (Compact Banner) */}
+        {/* Featured Voice Banner - Interactive & Alive */}
         {featuredVoice && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             style={{
               position: 'relative',
               width: '100%',
-              minHeight: '200px',
+              background: 'linear-gradient(to right, #0f172a 0%, #1e293b 100%)',
+              borderBottom: '1px solid rgba(71, 85, 105, 0.3)',
+              padding: '2rem',
+              marginBottom: '2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
               overflow: 'hidden',
-              marginBottom: '1.5rem',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.15) 0%, rgba(14, 116, 144, 0.1) 100%)',
-              border: '1px solid rgba(8, 145, 178, 0.3)',
             }}
           >
-            {/* Hero Background Gradient */}
+            {/* Background Glow Effect */}
             <div
               style={{
                 position: 'absolute',
                 top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.2) 0%, rgba(14, 116, 144, 0.1) 100%)',
-                zIndex: 0,
+                right: 0,
+                width: '256px',
+                height: '256px',
+                background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%)',
+                borderRadius: '50%',
+                filter: 'blur(48px)',
+                transform: 'translate(50%, -50%)',
+                pointerEvents: 'none',
               }}
             />
 
-            {/* Dark Overlay */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent)',
-                zIndex: 1,
-              }}
-            />
-
-            {/* Hero Content */}
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 2,
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                padding: '2rem 3rem',
-                maxWidth: '900px',
-              }}
-            >
-              {/* Featured Label */}
-              <span
+            {/* Left Section: Play Button + Info */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1.5rem',
+              position: 'relative',
+              zIndex: 2,
+              flex: 1,
+            }}>
+              {/* Play Button */}
+              <motion.button
+                onClick={() => handleTogglePlay(featuredVoice)}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
                 style={{
-                  display: 'inline-block',
-                  background: 'rgba(8, 145, 178, 0.8)',
-                  color: '#ffffff',
-                  padding: '0.25rem 0.65rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.65rem',
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  background: '#06b6d4',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 20px rgba(6, 182, 212, 0.5)',
+                  transition: 'all 0.3s ease',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#22d3ee';
+                  e.currentTarget.style.boxShadow = '0 0 30px rgba(6, 182, 212, 0.7)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#06b6d4';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(6, 182, 212, 0.5)';
+                }}
+              >
+                {playingVoiceId === featuredVoice.id ? (
+                  <Pause size={24} fill="#0f172a" color="#0f172a" />
+                ) : (
+                  <Play size={24} fill="#0f172a" color="#0f172a" style={{ marginLeft: '2px' }} />
+                )}
+              </motion.button>
+
+              {/* Voice Info */}
+              <div>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '0.5rem',
+                }}>
+                  <span style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    color: '#06b6d4',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.8px',
+                  }}>
+                    Featured Voice
+                  </span>
+                  {playingVoiceId === featuredVoice.id && (
+                    <span style={{
+                      fontSize: '0.7rem',
+                      color: '#06b6d4',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }}>
+                      ● Playing
+                    </span>
+                  )}
+                </div>
+                <h1 style={{
+                  fontSize: '1.875rem',
                   fontWeight: '700',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: '0.75rem',
-                  width: 'fit-content',
-                }}
-              >
-                Featured Voice
-              </span>
-
-              {/* Voice Name */}
-              <h1
-                style={{
-                  fontSize: '2rem',
-                  fontWeight: 'bold',
                   color: '#ffffff',
-                  margin: '0 0 0.5rem 0',
-                  letterSpacing: '-0.5px',
-                }}
-              >
-                {featuredVoice.name}
-              </h1>
-
-              {/* Category + Details */}
-              <p
-                style={{
-                  fontSize: '0.95rem',
-                  color: '#22d3ee',
+                  margin: '0 0 0.25rem 0',
+                }}>
+                  {featuredVoice.name}
+                </h1>
+                <p style={{
+                  fontSize: '0.875rem',
+                  color: '#94a3b8',
                   margin: '0',
-                  fontWeight: '500',
-                }}
-              >
-                {featuredVoice.category} • {featuredVoice.accent} • {featuredVoice.language}
-              </p>
+                }}>
+                  {featuredVoice.category} • {featuredVoice.accent}
+                </p>
+              </div>
             </div>
+
+            {/* Right Section: Waveform Visualizers */}
+            <div style={{
+              alignItems: 'center',
+              gap: '1rem',
+              paddingRight: '2rem',
+              position: 'relative',
+              zIndex: 2,
+              display: 'flex',
+            }}
+            className="hidden md:flex"
+            >
+              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
+              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
+              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
+            </div>
+
+            <style>{`
+              @keyframes pulse {
+                0%, 100% {
+                  opacity: 1;
+                }
+                50% {
+                  opacity: 0.5;
+                }
+              }
+            `}</style>
           </motion.div>
         )}
 
@@ -318,9 +402,12 @@ function Library() {
                 display: 'flex',
                 gap: '0.75rem',
                 overflowX: 'auto',
-                overflowY: 'hidden',
+                overflowY: 'visible',
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
+                padding: '1rem',
+                paddingLeft: '0',
+                paddingRight: '0',
               }}
               className="hide-scrollbar"
             >
