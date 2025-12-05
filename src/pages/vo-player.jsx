@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Plus, Play, Pause } from 'lucide-react';
+import { Plus, Play, Pause, Mic } from 'lucide-react';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceProvider, VoiceContext, CATEGORIES } from '../context/VoiceContext';
@@ -10,34 +10,104 @@ import LoginModal from '../components/LoginModal';
 import Header from '../components/Header';
 import '../styles/AuroraBackground.css';
 
-// Waveform Component - Animated Visualizer
-const Waveform = ({ isPlaying }) => {
+// Liquid Sine Wave Component - Full-Width Bottom Animation
+const LiquidWave = ({ isPlaying }) => {
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.35rem',
-      height: '32px',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '120px',
+      overflow: 'hidden',
+      zIndex: 1,
+      opacity: 0.6,
+      pointerEvents: 'none',
     }}>
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
+      <svg
+        viewBox="0 0 1200 120"
+        preserveAspectRatio="none"
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+        }}
+      >
+        {/* Wave Layer 1 - Primary Cyan Wave */}
+        <path
+          d="M0,60 C300,40 300,10 600,10 C900,10 900,90 1200,70 V120 H0 Z"
+          fill="rgba(6, 182, 212, 0.3)"
           style={{
-            width: '3px',
-            background: '#06b6d4',
-            borderRadius: '999px',
-            transition: 'all 0.3s ease',
-            height: isPlaying ? `${Math.random() * 100}%` : '4px',
-            minHeight: '4px',
-            animation: isPlaying ? `wave 0.6s ease-in-out infinite` : 'none',
-            animationDelay: `${i * 0.1}s`,
+            animation: isPlaying ? 'liquidWaveFast 4s ease-in-out infinite' : 'liquidWaveSlow 10s ease-in-out infinite',
           }}
         />
-      ))}
+
+        {/* Wave Layer 2 - Secondary Wave with Offset */}
+        <path
+          d="M0,80 C400,50 400,30 800,30 C1000,30 1000,100 1200,90 V120 H0 Z"
+          fill="rgba(6, 182, 212, 0.2)"
+          style={{
+            animation: isPlaying ? 'liquidWaveFastAlt 5s ease-in-out infinite' : 'liquidWaveSlowAlt 15s ease-in-out infinite',
+          }}
+        />
+
+        {/* Wave Layer 3 - Accent Wave */}
+        <path
+          d="M0,70 C250,45 250,15 650,15 C1050,15 1050,85 1200,75 V120 H0 Z"
+          fill="rgba(6, 182, 212, 0.15)"
+          style={{
+            animation: isPlaying ? 'liquidWaveFastAccent 3.5s ease-in-out infinite' : 'liquidWaveSlowAccent 12s ease-in-out infinite',
+          }}
+        />
+      </svg>
+
       <style>{`
-        @keyframes wave {
-          0%, 100% { height: 4px; opacity: 0.6; }
-          50% { height: 24px; opacity: 1; }
+        @keyframes liquidWaveFast {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-50px) translateY(-5px); }
+          50% { transform: translateX(-100px) translateY(0); }
+          75% { transform: translateX(-50px) translateY(5px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes liquidWaveSlow {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-30px) translateY(-3px); }
+          50% { transform: translateX(-60px) translateY(0); }
+          75% { transform: translateX(-30px) translateY(3px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes liquidWaveFastAlt {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(50px) translateY(5px); }
+          50% { transform: translateX(100px) translateY(0); }
+          75% { transform: translateX(50px) translateY(-5px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes liquidWaveSlowAlt {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(30px) translateY(3px); }
+          50% { transform: translateX(60px) translateY(0); }
+          75% { transform: translateX(30px) translateY(-3px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes liquidWaveFastAccent {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-70px) translateY(-4px); }
+          50% { transform: translateX(-140px) translateY(0); }
+          75% { transform: translateX(-70px) translateY(4px); }
+          100% { transform: translateX(0) translateY(0); }
+        }
+
+        @keyframes liquidWaveSlowAccent {
+          0% { transform: translateX(0) translateY(0); }
+          25% { transform: translateX(-40px) translateY(-2px); }
+          50% { transform: translateX(-80px) translateY(0); }
+          75% { transform: translateX(-40px) translateY(2px); }
+          100% { transform: translateX(0) translateY(0); }
         }
       `}</style>
     </div>
@@ -229,6 +299,21 @@ function Library() {
               }}
             />
 
+            {/* Centered Microphone Watermark */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 0,
+                opacity: 0.05,
+                pointerEvents: 'none',
+              }}
+            >
+              <Mic size={384} strokeWidth={1} color="#ffffff" />
+            </div>
+
             {/* Left Section: Play Button + Info */}
             <div style={{
               display: 'flex',
@@ -318,21 +403,8 @@ function Library() {
               </div>
             </div>
 
-            {/* Right Section: Waveform Visualizers */}
-            <div style={{
-              alignItems: 'center',
-              gap: '1rem',
-              paddingRight: '2rem',
-              position: 'relative',
-              zIndex: 2,
-              display: 'flex',
-            }}
-            className="hidden md:flex"
-            >
-              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
-              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
-              <Waveform isPlaying={playingVoiceId === featuredVoice.id} />
-            </div>
+            {/* Liquid Wave Animation at Bottom */}
+            <LiquidWave isPlaying={playingVoiceId === featuredVoice.id} />
 
             <style>{`
               @keyframes pulse {
