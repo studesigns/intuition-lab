@@ -212,6 +212,13 @@ export function VoiceProvider({ children }) {
     await deleteDoc(doc(db, 'voices', id));
   };
 
+  // Toggle featured status
+  const toggleFeatured = async (id, currentValue) => {
+    await updateDoc(doc(db, 'voices', id), {
+      featured: !currentValue
+    });
+  };
+
   // Context Provider - EXACT: lines 183-200
   const value = {
     isAdmin,
@@ -225,6 +232,7 @@ export function VoiceProvider({ children }) {
     addVoice,
     updateVoice,
     deleteVoice,
+    toggleFeatured,
     showInactivityWarning,
     setShowInactivityWarning,
   };

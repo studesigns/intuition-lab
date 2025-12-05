@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VoiceProvider, VoiceContext, CATEGORIES } from '../context/VoiceContext';
 import VoiceCard from '../components/VoiceCard';
+import AdminVoicesTable from '../components/AdminVoicesTable';
 import VoiceModal from '../components/VoiceModal';
 import LoginModal from '../components/LoginModal';
 import Header from '../components/Header';
@@ -32,11 +33,13 @@ const itemVariants = {
 
 // Main Library Component
 function Library() {
-  const { voices, loading, isAdmin } = useContext(VoiceContext);
+  const { voices, loading, isAdmin, deleteVoice, toggleFeatured } = useContext(VoiceContext);
   const [playingVoiceId, setPlayingVoiceId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingVoice, setEditingVoice] = useState(null);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [showTableView, setShowTableView] = useState(false);
+  const [deleteConfirmVoice, setDeleteConfirmVoice] = useState(null);
   const categoryRefs = useRef({});
   const audioRef = useRef(new Audio());
 
@@ -91,6 +94,9 @@ function Library() {
   };
 
   const allVoiceGroups = voicesByCategory();
+
+  // For table view - all voices
+  const filteredVoices = voices;
 
   // Filter based on active category
   let voiceGroups = {};
@@ -322,7 +328,7 @@ function Library() {
         )}
 
         {/* Category Filter Pills - Sticky Sub-navbar */}
-        {allCategories.length > 0 && (
+        {(allCategories.length > 0 || isAdmin) && (
           <div
             style={{
               position: 'sticky',
@@ -335,6 +341,61 @@ function Library() {
               marginBottom: '2rem',
             }}
           >
+            <div
+              style={{
+                maxWidth: '1400px',
+                margin: '0 auto',
+                display: 'flex',
+                gap: '0.75rem',
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+              className="hide-scrollbar"
+            >
+              {/* Admin Toggle Button - Right Side */}
+              {isAdmin && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowTableView(!showTableView)}
+                  style={{
+                    padding: '0.5rem 1.25rem',
+                    borderRadius: '9999px',
+                    border: showTableView ? 'none' : '1px solid rgba(255, 255, 255, 0.4)',
+                    backgroundColor: showTableView ? '#ffffff' : 'transparent',
+                    color: showTableView ? '#000000' : '#ffffff',
+                    fontWeight: '600',
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    marginLeft: 'auto',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!showTableView) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.6)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!showTableView) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                    }
+                  }}
+                >
+                  {showTableView ? 'Card View' : 'Admin View'}
+                </motion.button>
+              )}
+            </div>
+
+            {/* Category Pills - Scrollable */}
+            {allCategories.length > 0 && !showTableView && (
             <div
               style={{
                 maxWidth: '1400px',
@@ -419,6 +480,7 @@ function Library() {
                 </motion.button>
               ))}
             </div>
+            )}
           </div>
         )}
 
@@ -443,8 +505,47 @@ function Library() {
             </div>
           )}
 
+          {/* Admin Table View */}
+          {!loading && isAdmin && showTableView && (
+            <>
+              <div style={{ marginBottom: '2rem' }}>
+                {isAdmin && showTableView && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowAddModal(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.75rem 1.5rem',
+                      background: '#ffffff',
+                      color: '#000000',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Plus size={18} />
+                    Add Voice
+                  </motion.button>
+                )}
+              </div>
+              <AdminVoicesTable
+                voices={filteredVoices}
+                onEditVoice={(voice) => { setEditingVoice(voice); setShowAddModal(true); }}
+                onDeleteVoice={(voice) => setDeleteConfirmVoice(voice)}
+                onToggleFeatured={toggleFeatured}
+                loading={loading}
+              />
+            </>
+          )}
+
           {/* Voice Categories */}
-          {!loading && categories.length > 0 && (
+          {!loading && categories.length > 0 && (!isAdmin || !showTableView) && (
             <motion.div
               variants={containerVariants}
               initial="hidden"
@@ -566,6 +667,104 @@ function Library() {
               setEditingVoice(null);
             }}
           />
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirmVoice && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+              background: 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
+            onClick={() => setDeleteConfirmVoice(null)}
+          >
+            <div
+              style={{
+                background: '#1f2937',
+                borderRadius: '1rem',
+                padding: '2rem',
+                maxWidth: '28rem',
+                width: '100%',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 style={{
+                fontSize: '1.25rem',
+                fontWeight: 'bold',
+                color: '#ffffff',
+                marginBottom: '0.5rem',
+              }}>
+                Delete Voice
+              </h2>
+              <p style={{
+                color: '#d1d5db',
+                marginBottom: '1.5rem',
+              }}>
+                Are you sure you want to delete <strong>{deleteConfirmVoice.name}</strong>? This action cannot be undone.
+              </p>
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+              }}>
+                <button
+                  onClick={() => setDeleteConfirmVoice(null)}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: '#ffffff',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    background: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await deleteVoice(deleteConfirmVoice.id);
+                    setDeleteConfirmVoice(null);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    background: '#dc2626',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#b91c1c';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#dc2626';
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
